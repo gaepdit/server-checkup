@@ -27,6 +27,11 @@ namespace CheckServerSetup
                 return;
             }
 
+            AnsiConsole.WriteLine();
+            AnsiConsole.Render(new Rule(Emoji.Known.Clipboard +
+                $" Checking setup on {Environment.MachineName}.")
+                .LeftAligned().RuleStyle("yellow bold"));
+
             await CheckDatabase.ExecuteAsync(_checkDatabaseOptions);
             await CheckEmail.ExecuteAsync(_checkEmailOptions);
             await CheckExternalServices.ExecuteAsync(_checkExternalServicesOptions);
