@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Spectre.Console;
@@ -8,7 +9,9 @@ namespace CheckServerSetup
 {
     class Program
     {
-        static async Task Main(string[] args)
+        /// <param name="email">An email recipient to use with testing the email 
+        /// setup (in addition to those in the appsettings.json file).</param>
+        static async Task Main(string email)
         {
             var _checkDatabaseOptions = new CheckDatabaseOptions();
             var _checkEmailOptions = new CheckEmailOptions();
@@ -25,6 +28,13 @@ namespace CheckServerSetup
             {
                 AnsiConsole.MarkupLine(ExceptionMessage(ex, "configuration error"));
                 return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(email))
+            {
+                _checkEmailOptions.Recipients = _checkEmailOptions.Recipients is null
+                    ? new[] { email }
+                    : _checkEmailOptions.Recipients.Append(email).ToArray();
             }
 
             AnsiConsole.WriteLine();

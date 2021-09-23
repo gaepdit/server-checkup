@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Version>1.1.0</Version>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
     <PublishSingleFile>true</PublishSingleFile>
@@ -14,6 +15,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
     <PackageReference Include="Spectre.Console" Version="0.41.0" />
     <PackageReference Include="Spectre.Console.Analyzer" Version="0.41.0" />
+    <PackageReference Include="System.CommandLine.DragonFruit" Version="0.3.0-alpha.21216.1" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
   </ItemGroup>
 
