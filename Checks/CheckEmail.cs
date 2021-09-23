@@ -52,7 +52,7 @@ namespace CheckServerSetup
                     return;
                 }
 
-                _options.Recipients = new string[] { addRecipient };
+                _options.Recipients = new[] { addRecipient };
             }
 
             var table = new Table().Collapse().Border(TableBorder.Rounded)

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -7,11 +7,11 @@ using static CheckServerSetup.Messages;
 
 namespace CheckServerSetup
 {
-    class Program
+    internal class Program
     {
         /// <param name="email">An email recipient to use with testing the email 
         /// setup (in addition to those in the appsettings.json file).</param>
-        static async Task Main(string email)
+        private static async Task Main(string email)
         {
             var _checkDatabaseOptions = new CheckDatabaseOptions();
             var _checkEmailOptions = new CheckEmailOptions();
@@ -39,7 +39,7 @@ namespace CheckServerSetup
 
             AnsiConsole.WriteLine();
             AnsiConsole.Render(new Rule(Emoji.Known.Clipboard +
-                $" Checking setup on {Environment.MachineName}.")
+                    $" Checking setup on {Environment.MachineName}.")
                 .LeftAligned().RuleStyle("yellow bold"));
 
             await CheckDatabase.ExecuteAsync(_checkDatabaseOptions);

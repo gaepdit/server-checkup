@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using Spectre.Console;
 
 namespace CheckServerSetup
@@ -9,14 +10,14 @@ namespace CheckServerSetup
         {
             if (ex is null) return string.Empty;
 
-            var message = $"[red]Error: {description}.[/]\r\n{ex.Message}";
+            var message = new StringBuilder($"[red]Error: {description}.[/]\r\n{ex.Message}");
 
             if (ex.InnerException != null)
             {
-                message = $"{message}\r\n[dim]{ex.InnerException.Message.EscapeMarkup()}[/]";
+                message.Append($"{message}\r\n[dim]{ex.InnerException.Message.EscapeMarkup()}[/]");
             }
 
-            return message;
+            return message.ToString();
         }
     }
 }

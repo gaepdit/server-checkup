@@ -46,9 +46,9 @@ namespace CheckServerSetup
 
                     try
                     {
-                        using var connection = new SqlConnection(builder.ConnectionString);
-                        var query = "select 1";
-                        using var command = new SqlCommand(query, connection);
+                        await using var connection = new SqlConnection(builder.ConnectionString);
+                        const string query = "select 1";
+                        await using var command = new SqlCommand(query, connection);
                         await connection.OpenAsync();
                         command.ExecuteScalar();
                         await connection.CloseAsync();

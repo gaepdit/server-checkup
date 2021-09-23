@@ -42,14 +42,10 @@ namespace CheckServerSetup
                         var uri = new Uri(site);
                         await tcpClient.ConnectAsync(uri.Host, uri.Port);
 
-                        if (tcpClient.Connected)
-                        {
-                            table.AddRow(site, $"[green]Connection successful.[/]");
-                        }
-                        else
-                        {
-                            table.AddRow(site, $"[blue]Host reached, but connection unsuccessful.[/]");
-                        }
+                        table.AddRow(site,
+                            tcpClient.Connected
+                                ? "[green]Connection successful.[/]"
+                                : "[blue]Host reached, but connection unsuccessful.[/]");
                     }
                     catch (Exception ex)
                     {
