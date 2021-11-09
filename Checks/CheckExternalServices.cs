@@ -1,79 +1,74 @@
-using System;
 using System.Net.Sockets;
-using System.Threading.Tasks;
-using Spectre.Console;
-using static CheckServerSetup.Messages;
 
-namespace CheckServerSetup
+namespace CheckServerSetup.Checks;
+
+internal static class CheckExternalServices
 {
-    internal static class CheckExternalServices
+    public static async Task ExecuteAsync(CheckExternalServicesOptions _options)
     {
-        public static async Task ExecuteAsync(CheckExternalServicesOptions _options)
+        AnsiConsole.WriteLine();
+
+        if (_options.Skip())
         {
-            AnsiConsole.WriteLine();
+            AnsiConsole.Write(new Rule(Emoji.Known.StopSign +
+                " Skipping external services checks.")
+                .LeftAligned());
+            return;
+        }
 
-            if (_options.Skip())
+        AnsiConsole.Write(new Rule(Emoji.Known.GlobeWithMeridians +
+            " Checking connectivity to external services...")
+            .LeftAligned().RuleStyle("blue"));
+        AnsiConsole.WriteLine();
+
+        var table = new Table().Collapse().Border(TableBorder.Rounded)
+            .AddColumn("Destination").AddColumn("Result")
+            .Caption("[blue][bold][slowblink]Working...[/][/][/]");
+
+        await AnsiConsole.Live(table).StartAsync(async c =>
+        {
+            c.Refresh();
+
+            foreach (var site in _options.ExternalServices)
             {
-                AnsiConsole.Render(new Rule(Emoji.Known.StopSign +
-                    " Skipping external services checks.")
-                    .LeftAligned());
-                return;
-            }
+                var tcpClient = new TcpClient();
 
-            AnsiConsole.Render(new Rule(Emoji.Known.GlobeWithMeridians +
-                " Checking connectivity to external services...")
-                .LeftAligned().RuleStyle("blue"));
-            AnsiConsole.WriteLine();
-
-            var table = new Table().Collapse().Border(TableBorder.Rounded)
-                .AddColumn("Destination").AddColumn("Result")
-                .Caption("[blue][bold][slowblink]Working...[/][/][/]");
-
-            await AnsiConsole.Live(table).StartAsync(async c =>
-            {
-                c.Refresh();
-
-                foreach (var site in _options.ExternalServices)
+                try
                 {
-                    var tcpClient = new TcpClient();
+                    var uri = new Uri(site);
+                    await tcpClient.ConnectAsync(uri.Host, uri.Port);
 
-                    try
-                    {
-                        var uri = new Uri(site);
-                        await tcpClient.ConnectAsync(uri.Host, uri.Port);
-
-                        table.AddRow(site,
-                            tcpClient.Connected
-                                ? "[green]Connection successful.[/]"
-                                : "[blue]Host reached, but connection unsuccessful.[/]");
-                    }
-                    catch (Exception ex)
-                    {
-                        table.AddRow(site, ExceptionMessage(ex, "connection failed"));
-                    }
-                    finally
-                    {
-                        tcpClient.Close();
-                    }
-
-                    c.Refresh();
+                    table.AddRow(site,
+                        tcpClient.Connected
+                            ? "[green]Connection successful.[/]"
+                            : "[blue]Host reached, but connection unsuccessful.[/]");
+                }
+                catch (Exception ex)
+                {
+                    table.AddRow(site, ExceptionMessage(ex, "connection failed"));
+                }
+                finally
+                {
+                    tcpClient.Close();
                 }
 
-                table.Caption("Finished checking external services.");
                 c.Refresh();
-            });
-        }
-    }
+            }
 
-    internal class CheckExternalServicesOptions
-    {
-        public bool Enabled { get; set; }
-        public string[] ExternalServices { get; set; }
-        public bool Skip() =>
-            !Enabled
-            || ExternalServices == null
-            || ExternalServices.Length == 0;
-
+            table.Caption("Finished checking external services.");
+            c.Refresh();
+        });
     }
+}
+
+internal class CheckExternalServicesOptions
+{
+    public bool Enabled { get; set; }
+    public string[] ExternalServices { get; set; }
+    public bool Skip() =>
+        !Enabled
+        || ExternalServices == null
+        || ExternalServices.Length == 0;
+
 }
 
