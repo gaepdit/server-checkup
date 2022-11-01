@@ -1,0 +1,35 @@
+﻿@using CheckServerSetup.Checks
+@model CheckServerSetup.Checks.CheckResult?
+
+@if (Model == null)
+{
+    return;
+}
+
+@switch (Model.ResultContext)
+{
+    case CheckResult.Context.Success:
+        <h2 class="text-success">Success</h2>
+        break;
+    case CheckResult.Context.Error:
+        <h2 class="text-danger">Errors occurred</h2>
+        break;
+    case CheckResult.Context.Warning:
+        <h2 class="text-warning">Issues occurred</h2>
+        break;
+    case CheckResult.Context.Info:
+    default:
+        break;
+}
+
+@if (Model.Messages.Count > 0)
+{
+    <ul class="list-group">
+        @foreach (var message in Model.Messages)
+        {
+            <li class="list-group-item list-group-item-@CheckResult.ClassSuffix(message.MessageContext)">
+                @Html.DisplayFor(m => message)
+            </li>
+        }
+    </ul>
+}

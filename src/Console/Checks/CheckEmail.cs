@@ -5,29 +5,28 @@ namespace CheckServerSetup.Checks;
 
 internal static class CheckEmail
 {
-    public static async Task ExecuteAsync(CheckEmailOptions _options)
+    public static async Task ExecuteAsync(CheckEmailOptions options)
     {
         AnsiConsole.WriteLine();
 
-        if (_options.Skip())
+        if (options.Skip())
         {
             AnsiConsole.Write(new Rule(Emoji.Known.StopSign +
-                " Skipping email SMTP configuration checks.")
+                    " Skipping email SMTP configuration checks.")
                 .LeftAligned());
             return;
         }
 
         AnsiConsole.Write(new Rule(Emoji.Known.ClosedMailboxWithRaisedFlag +
-            " Checking email SMTP configuration...")
+                " Checking email SMTP configuration...")
             .LeftAligned().RuleStyle("blue"));
         AnsiConsole.WriteLine();
 
-        MailAddress _sender;
-        MailAddress _recipient;
+        MailAddress sender;
 
         try
         {
-            _sender = new MailAddress(_options.SenderEmail);
+            sender = new MailAddress(options.SenderEmail);
         }
         catch (FormatException ex)
         {
@@ -37,7 +36,7 @@ internal static class CheckEmail
             return;
         }
 
-        if (_options.Recipients is null || _options.Recipients.Length == 0)
+        if (options.Recipients is null || options.Recipients.Length == 0)
         {
             var addRecipient = AnsiConsole.Prompt(new TextPrompt<string>(
                 "Enter email recipient (leave empty to skip):").AllowEmpty());
@@ -48,7 +47,7 @@ internal static class CheckEmail
                 return;
             }
 
-            _options.Recipients = new[] { addRecipient };
+            options.Recipients = new[] { addRecipient };
         }
 
         var table = new Table().Collapse().Border(TableBorder.Rounded)
@@ -59,11 +58,13 @@ internal static class CheckEmail
         {
             c.Refresh();
 
-            foreach (var recipient in _options.Recipients)
+            foreach (var recipient in options.Recipients)
             {
+                MailAddress mailRecipient;
+
                 try
                 {
-                    _recipient = new MailAddress(recipient);
+                    mailRecipient = new MailAddress(recipient);
                 }
                 catch (FormatException ex)
                 {
@@ -74,7 +75,7 @@ internal static class CheckEmail
 
                 try
                 {
-                    using var message = new MailMessage(_sender, _recipient)
+                    using var message = new MailMessage(sender, mailRecipient)
                     {
                         Subject = $"Email test from {Environment.MachineName}",
                         Body = $"This is a test email sent from {Environment.MachineName}",
@@ -82,10 +83,11 @@ internal static class CheckEmail
                         BodyEncoding = Encoding.UTF8
                     };
 
-                    using var client = new SmtpClient(_options.SmtpHost, _options.SmtpPort) { EnableSsl = false };
+                    using var client = new SmtpClient(options.SmtpHost, options.SmtpPort) { EnableSsl = false };
                     await client.SendMailAsync(message);
 
-                    table.AddRow(recipient, "[green]Email successfully sent.[/]\r\n[dim](Check for receipt of email.)[/]");
+                    table.AddRow(recipient,
+                        "[green]Email successfully sent.[/]\r\n[dim](Check for receipt of email.)[/]");
                 }
                 catch (Exception ex)
                 {
@@ -108,9 +110,10 @@ internal class CheckEmailOptions
     public string SmtpHost { get; set; }
     public int SmtpPort { get; set; }
     public string[] Recipients { get; set; }
+
     public bool Skip() =>
-            !Enabled
-            || string.IsNullOrEmpty(SenderEmail)
-            || string.IsNullOrEmpty(SmtpHost)
-            || SmtpPort == 0;
+        !Enabled
+        || string.IsNullOrEmpty(SenderEmail)
+        || string.IsNullOrEmpty(SmtpHost)
+        || SmtpPort == 0;
 }

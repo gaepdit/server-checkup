@@ -4,11 +4,11 @@ namespace CheckServerSetup.Checks;
 
 internal static class CheckExternalServices
 {
-    public static async Task ExecuteAsync(CheckExternalServicesOptions _options)
+    public static async Task ExecuteAsync(CheckExternalServicesOptions options)
     {
         AnsiConsole.WriteLine();
 
-        if (_options.Skip())
+        if (options.Skip())
         {
             AnsiConsole.Write(new Rule(Emoji.Known.StopSign +
                 " Skipping external services checks.")
@@ -29,7 +29,7 @@ internal static class CheckExternalServices
         {
             c.Refresh();
 
-            foreach (var site in _options.ExternalServices)
+            foreach (var site in options.ExternalServices)
             {
                 var tcpClient = new TcpClient();
 

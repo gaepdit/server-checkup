@@ -4,11 +4,11 @@ namespace CheckServerSetup.Checks;
 
 internal static class CheckDatabase
 {
-    public static async Task ExecuteAsync(CheckDatabaseOptions _options)
+    public static async Task ExecuteAsync(CheckDatabaseOptions options)
     {
         AnsiConsole.WriteLine();
 
-        if (_options.Skip())
+        if (options.Skip())
         {
             AnsiConsole.Write(new Rule(Emoji.Known.StopSign +
                 " Skipping database connection checks.")
@@ -29,14 +29,14 @@ internal static class CheckDatabase
         {
             c.Refresh();
 
-            foreach (var db in _options.DatabaseConnections)
+            foreach (var db in options.DatabaseConnections)
             {
                 var builder = new SqlConnectionStringBuilder()
                 {
                     DataSource = db.DataSource,
                     InitialCatalog = db.InitialCatalog,
                     IntegratedSecurity = false,
-                    UserID = db.UserID,
+                    UserID = db.UserId,
                     Password = db.Password
                 };
 
@@ -49,11 +49,11 @@ internal static class CheckDatabase
                     command.ExecuteScalar();
                     await connection.CloseAsync();
 
-                    table.AddRow(db.DataSource, db.UserID, "[green]Connection successful.[/]");
+                    table.AddRow(db.DataSource, db.UserId, "[green]Connection successful.[/]");
                 }
                 catch (Exception ex)
                 {
-                    table.AddRow(db.DataSource, db.UserID, ExceptionMessage(ex, "connection failed"));
+                    table.AddRow(db.DataSource, db.UserId, ExceptionMessage(ex, "connection failed"));
                 }
 
                 c.Refresh();
@@ -80,7 +80,7 @@ internal class DatabaseConnections
 {
     public string DataSource { get; set; }
     public string InitialCatalog { get; set; }
-    public string UserID { get; set; }
+    public string UserId { get; set; }
     public string Password { get; set; }
 }
 
