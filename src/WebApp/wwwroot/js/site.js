@@ -1,7 +1,7 @@
 ﻿$(document).ready(function () {
-    prepCheck('#email-check', '/Check?handler=Email');
-    prepCheck('#database-check', '/Check?handler=Database');
-    prepCheck('#service-check', '/Check?handler=ExternalService');
+    prepCheck('#email-check', baseUrl + '/Check?handler=Email');
+    prepCheck('#database-check', baseUrl + '/Check?handler=Database');
+    prepCheck('#service-check', baseUrl + '/Check?handler=ExternalService');
 
     $('#check-all').click(function () {
         $('.check-btn').click();
