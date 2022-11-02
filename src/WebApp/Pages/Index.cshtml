@@ -1,10 +1,10 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Server health checkup";
+    ViewData["Title"] = $"Server Checkup: {@Environment.MachineName}";
 }
 
-<h1>Server Health Checks: @Environment.MachineName</h1>
+<h1>@ViewData["Title"]</h1>
 <div>
     <button type="button" class="btn btn-primary" id="check-all">Run all checks</button>
 </div>
