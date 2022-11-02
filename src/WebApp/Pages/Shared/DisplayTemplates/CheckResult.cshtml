@@ -27,9 +27,7 @@
     <ul class="list-group">
         @foreach (var message in Model.Messages)
         {
-            <li class="list-group-item list-group-item-@CheckResult.ClassSuffix(message.MessageContext)">
-                @Html.DisplayFor(m => message)
-            </li>
+            @Html.DisplayFor(m => message)
         }
     </ul>
 }

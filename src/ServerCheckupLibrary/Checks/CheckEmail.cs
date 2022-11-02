@@ -114,5 +114,5 @@ public class CheckEmailOptions
     public string SenderEmail { get; [UsedImplicitly] init; } = "";
     public string SmtpHost { get; [UsedImplicitly] init; } = "";
     public int SmtpPort { get; [UsedImplicitly] init; }
-    public string[]? Recipients { get; [UsedImplicitly] init; }
+    public string[]? Recipients { get; [UsedImplicitly] set; }
 }

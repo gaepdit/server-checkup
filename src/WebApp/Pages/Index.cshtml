@@ -1,49 +1,78 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Server health checkup";
 }
 
-<h1>
-    Server Health Checks
+<h1>Server Health Checks: @Environment.MachineName</h1>
+<div>
     <button type="button" class="btn btn-primary" id="check-all">Run all checks</button>
-</h1>
+</div>
 
 <div class="card mt-4" id="email-check">
     <div class="card-header">Email configuration</div>
     <div class="card-body">
-        <button type="button" class="check-btn btn btn-primary">
-            <span class="check-btn-text">Run checks</span>
-            <span class="check-btn-spinner spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-            <span class="check-btn-loading d-none">Running...</span>
-        </button>
-        <div class="check-results mt-2"></div>
+        @if (Model.EmailCheckMessage is not null)
+        {
+            <ul class="list-group">
+                @Html.DisplayFor(m => m.EmailCheckMessage)
+            </ul>
+        }
+        else
+        {
+            <button type="button" class="check-btn btn btn-primary">
+                <span class="check-btn-text">Run checks</span>
+                <span class="check-btn-spinner spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                <span class="check-btn-loading d-none">Running...</span>
+            </button>
+            <div class="check-results mt-2"></div>
+        }
     </div>
 </div>
 
 <div class="card mt-4" id="database-check">
     <div class="card-header">Database connectivity</div>
     <div class="card-body">
-        <button type="button" class="check-btn btn btn-primary">
-            <span class="check-btn-text">Run checks</span>
-            <span class="check-btn-spinner spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-            <span class="check-btn-loading d-none">Running...</span>
-        </button>
-        <div class="check-results mt-2"></div>
+        @if (Model.DatabaseCheckMessage is not null)
+        {
+            <ul class="list-group">
+                @Html.DisplayFor(m => m.DatabaseCheckMessage)
+            </ul>
+        }
+        else
+        {
+            <button type="button" class="check-btn btn btn-primary">
+                <span class="check-btn-text">Run checks</span>
+                <span class="check-btn-spinner spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                <span class="check-btn-loading d-none">Running...</span>
+            </button>
+            <div class="check-results mt-2"></div>
+        }
     </div>
 </div>
 
 <div class="card mt-4" id="service-check">
     <div class="card-header">External services</div>
     <div class="card-body">
-        <button type="button" class="check-btn btn btn-primary">
-            <span class="check-btn-text">Run checks</span>
-            <span class="check-btn-spinner spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-            <span class="check-btn-loading d-none">Running...</span>
-        </button>
-        <div class="check-results mt-2"></div>
+        @if (Model.ExternalServiceCheckMessage is not null)
+        {
+            <ul class="list-group">
+                @Html.DisplayFor(m => m.ExternalServiceCheckMessage)
+            </ul>
+        }
+        else
+        {
+            <button type="button" class="check-btn btn btn-primary">
+                <span class="check-btn-text">Run checks</span>
+                <span class="check-btn-spinner spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                <span class="check-btn-loading d-none">Running...</span>
+            </button>
+            <div class="check-results mt-2"></div>
+        }
     </div>
 </div>
+
+<partial name="_MessageIconSpritePartial" />
 
 @section Scripts
 {

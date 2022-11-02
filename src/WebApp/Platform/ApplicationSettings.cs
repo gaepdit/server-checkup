@@ -1,6 +1,6 @@
 ﻿using CheckServerSetup.Checks;
 
-namespace MyAppRoot.WebApp.Platform.Settings;
+namespace WebApp.Platform;
 
 public static class ApplicationSettings
 {
