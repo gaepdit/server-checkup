@@ -89,21 +89,50 @@ public static class CheckEmail
             }
         }
 
+        if (!options.CheckSslEmail) return result;
+
+        foreach (var recipient in recipients)
+        {
+            try
+            {
+                await SendTestEmail(sender!, recipient, options, true);
+                result.AddMessage(Context.Success,
+                    $"Successfully sent email to \"{recipient}\" using SSL.", "(Check for receipt).");
+            }
+            catch (SmtpException ex)
+            {
+                result.AddMessage(Context.Error,
+                    $"Unable to send email to \"{recipient}\" using SSL.",
+                    $"{ex.GetType()}; Status code: {ex.StatusCode.ToString()}");
+            }
+            catch (Exception ex)
+            {
+                result.AddMessage(Context.Error,
+                    $"Unable to send email to \"{recipient}\" using SSL.",
+                    ex.GetType().ToString());
+            }
+        }
+
         return result;
     }
 
 
-    private static async Task SendTestEmail(MailAddress sender, MailAddress recipient, CheckEmailOptions options)
+    private static async Task SendTestEmail(
+        MailAddress sender,
+        MailAddress recipient,
+        CheckEmailOptions options,
+        bool enableSsl = false)
     {
         using var message = new MailMessage(sender, recipient)
         {
-            Subject = $"Email test from {Environment.MachineName}",
-            Body = $"This is a test email sent from {Environment.MachineName}",
+            Subject = $"Email test from {Environment.MachineName}{(enableSsl ? " (SSL enabled)" : string.Empty)}",
+            Body =
+                $"This is a test email sent from {Environment.MachineName}{(enableSsl ? " (SSL enabled)" : string.Empty)}",
             SubjectEncoding = Encoding.UTF8,
             BodyEncoding = Encoding.UTF8,
         };
 
-        using var client = new SmtpClient(options.SmtpHost, options.SmtpPort) { EnableSsl = false };
+        using var client = new SmtpClient(options.SmtpHost, options.SmtpPort) { EnableSsl = enableSsl };
         await client.SendMailAsync(message);
     }
 }
@@ -112,6 +141,7 @@ public class CheckEmailOptions
 {
     public bool Enabled { get; [UsedImplicitly] init; }
     public string SenderEmail { get; [UsedImplicitly] init; } = "";
+    public bool CheckSslEmail { get; [UsedImplicitly] set; }
     public string SmtpHost { get; [UsedImplicitly] init; } = "";
     public int SmtpPort { get; [UsedImplicitly] init; }
     public string[]? Recipients { get; [UsedImplicitly] set; }
