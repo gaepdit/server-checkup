@@ -123,11 +123,15 @@ public static class CheckEmail
         CheckEmailOptions options,
         bool enableSsl = false)
     {
+        var serverName = string.IsNullOrWhiteSpace(options.ServerName)
+            ? Environment.MachineName
+            : $"{options.ServerName} ({Environment.MachineName})";
+
         using var message = new MailMessage(sender, recipient)
         {
-            Subject = $"Email test from {Environment.MachineName}{(enableSsl ? " (SSL enabled)" : string.Empty)}",
+            Subject = $"Email test from {serverName}{(enableSsl ? " (SSL enabled)" : string.Empty)}",
             Body =
-                $"This is a test email sent from {Environment.MachineName}{(enableSsl ? " (SSL enabled)" : string.Empty)}",
+                $"This is a test email sent from {serverName}{(enableSsl ? " (SSL enabled)" : string.Empty)}",
             SubjectEncoding = Encoding.UTF8,
             BodyEncoding = Encoding.UTF8,
         };
@@ -144,5 +148,6 @@ public class CheckEmailOptions
     public bool CheckSslEmail { get; [UsedImplicitly] set; }
     public string SmtpHost { get; [UsedImplicitly] init; } = "";
     public int SmtpPort { get; [UsedImplicitly] init; }
-    public string[]? Recipients { get; [UsedImplicitly] set; }
+    public string[]? Recipients { get; set; }
+    public string ServerName { get; set; } = string.Empty;
 }

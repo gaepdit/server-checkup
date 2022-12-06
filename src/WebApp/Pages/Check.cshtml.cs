@@ -13,6 +13,7 @@ public class CheckModel : PageModel
     public async Task OnGetEmailAsync()
     {
         ApplicationSettings.CheckEmailOptions.Recipients = new[] { User.Identity?.Name ?? string.Empty };
+        ApplicationSettings.CheckEmailOptions.ServerName = ApplicationSettings.ServerName;
         Result = await CheckEmail.ExecuteAsync(ApplicationSettings.CheckEmailOptions);
     }
 

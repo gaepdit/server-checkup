@@ -1,7 +1,11 @@
 ﻿@page
+@using WebApp.Platform
 @model IndexModel
 @{
-    ViewData["Title"] = $"Server Checkup: {@Environment.MachineName}";
+    var serverName = string.IsNullOrWhiteSpace(ApplicationSettings.ServerName)
+        ? Environment.MachineName
+        : $"{ApplicationSettings.ServerName} ({Environment.MachineName})";
+    ViewData["Title"] = $"Server Checkup: {serverName}";
 }
 
 <h1>@ViewData["Title"]</h1>

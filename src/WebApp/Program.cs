@@ -15,6 +15,7 @@ builder.Configuration.GetSection(nameof(CheckServerSetup.Checks.CheckDatabaseOpt
     .Bind(ApplicationSettings.CheckDatabaseOptions);
 builder.Configuration.GetSection(nameof(CheckServerSetup.Checks.CheckExternalServiceOptions))
     .Bind(ApplicationSettings.CheckExternalServiceOptions);
+ApplicationSettings.ServerName = builder.Configuration.GetValue<string>(nameof(ApplicationSettings.ServerName));
 
 // Configure authentication.
 if (builder.Environment.IsLocalEnv())
@@ -32,6 +33,7 @@ else
         .AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
         .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
 }
+
 builder.Services.AddAuthorization();
 
 // Persist data protection keys.
