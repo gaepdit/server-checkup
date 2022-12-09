@@ -136,7 +136,8 @@ public static class CheckEmail
             BodyEncoding = Encoding.UTF8,
         };
 
-        using var client = new SmtpClient(options.SmtpHost, options.SmtpPort) { EnableSsl = enableSsl };
+        using var client = new SmtpClient(options.SmtpHost, enableSsl ? options.SmtpSslPort : options.SmtpPort)
+            { EnableSsl = enableSsl };
         await client.SendMailAsync(message);
     }
 }
@@ -145,9 +146,10 @@ public class CheckEmailOptions
 {
     public bool Enabled { get; [UsedImplicitly] init; }
     public string SenderEmail { get; [UsedImplicitly] init; } = "";
-    public bool CheckSslEmail { get; [UsedImplicitly] set; }
     public string SmtpHost { get; [UsedImplicitly] init; } = "";
     public int SmtpPort { get; [UsedImplicitly] init; }
+    public bool CheckSslEmail { get; [UsedImplicitly] set; }
+    public int SmtpSslPort { get; [UsedImplicitly] init; }
     public string[]? Recipients { get; set; }
     public string ServerName { get; set; } = string.Empty;
 }
