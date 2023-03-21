@@ -15,7 +15,7 @@ builder.Configuration.GetSection(nameof(CheckServerSetup.Checks.CheckDatabaseOpt
 builder.Configuration.GetSection(nameof(CheckServerSetup.Checks.CheckExternalServiceOptions))
     .Bind(ApplicationSettings.CheckExternalServiceOptions);
 builder.Configuration.GetSection(nameof(DevOptions)).Bind(ApplicationSettings.DevOptions);
-ApplicationSettings.ServerName = builder.Configuration.GetValue<string>(nameof(ApplicationSettings.ServerName));
+ApplicationSettings.ServerName = builder.Configuration.GetValue<string>(nameof(ApplicationSettings.ServerName)) ?? "Unknown";
 
 // Configure authentication.
 if (ApplicationSettings.DevOptions.UseLocalAuth)
@@ -37,7 +37,7 @@ else
 builder.Services.AddAuthorization();
 
 // Persist data protection keys.
-var keysFolder = Path.Combine(builder.Configuration["PersistedFilesBasePath"], "DataProtectionKeys");
+var keysFolder = Path.Combine(builder.Configuration["PersistedFilesBasePath"] ?? "./", "DataProtectionKeys");
 builder.Services.AddDataProtection().PersistKeysToFileSystem(Directory.CreateDirectory(keysFolder));
 
 // Configure HSTS (max age: two years).
