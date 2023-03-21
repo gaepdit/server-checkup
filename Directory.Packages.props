@@ -1,13 +1,13 @@
 <Project>
-    <PropertyGroup>
-        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    </PropertyGroup>
-    <ItemGroup>
-		<PackageVersion Include="JetBrains.Annotations" Version="2022.3.1" />
-		<PackageVersion Include="LigerShark.WebOptimizer.Core" Version="3.0.372" />
-		<PackageVersion Include="Microsoft.Identity.Web.UI" Version="1.25.5" />
-		<PackageVersion Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
-		<PackageVersion Include="SonarAnalyzer.CSharp" Version="8.48.0.56517" />
-		<PackageVersion Include="System.Data.SqlClient" Version="4.8.5" />
-	</ItemGroup>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="JetBrains.Annotations" Version="2022.3.1" />
+    <PackageVersion Include="LigerShark.WebOptimizer.Core" Version="3.0.380" />
+    <PackageVersion Include="Microsoft.Identity.Web.UI" Version="1.25.5" />
+    <PackageVersion Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
+    <PackageVersion Include="SonarAnalyzer.CSharp" Version="8.55.0.65544" />
+    <PackageVersion Include="System.Data.SqlClient" Version="4.8.5" />
+  </ItemGroup>
 </Project>
