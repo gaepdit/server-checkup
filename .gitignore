@@ -546,3 +546,9 @@ appsettings.*.json
 .artifacts/
 # Library Manager
 **/wwwroot/lib/
+
+# Note: Remove the next line if you want to check in JetBrains configuration files.
+.idea/
+
+# SonarLint Rider plugin
+.idea/**/sonarlint-state.xml
