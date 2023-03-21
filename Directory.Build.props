@@ -1,6 +1,12 @@
 <Project>
-    <PropertyGroup>
-        <BaseOutputPath>$(MSBuildThisFileDirectory).artifacts\$(MSBuildProjectName)\bin\</BaseOutputPath>
-        <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory).artifacts\$(MSBuildProjectName)\obj\</BaseIntermediateOutputPath>
-    </PropertyGroup>
+	<PropertyGroup>
+		<BaseProjectArtifactPath>$(MSBuildThisFileDirectory).artifacts\$(MSBuildProjectName)</BaseProjectArtifactPath>
+		<BaseOutputPath>$(BaseProjectArtifactPath)\bin\</BaseOutputPath>
+		<BaseIntermediateOutputPath>$(BaseProjectArtifactPath)\obj\</BaseIntermediateOutputPath>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<!-- https://aka.ms/vs-build-acceleration -->
+		<AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+	</PropertyGroup>
 </Project>
