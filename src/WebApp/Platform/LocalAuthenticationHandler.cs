@@ -10,20 +10,17 @@ namespace WebApp.Platform;
 internal class LocalAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
     public const string BasicAuthenticationScheme = "BasicAuthentication";
-    private readonly IConfiguration _configuration;
 
     public LocalAuthenticationHandler(
         IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory logger,
         UrlEncoder encoder,
-        ISystemClock clock,
-        IConfiguration configuration)
-        : base(options, logger, encoder, clock) =>
-        _configuration = configuration;
+        ISystemClock clock)
+        : base(options, logger, encoder, clock) { }
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        var userEmail = _configuration.GetValue<string?>("AuthenticatedUser");
+        var userEmail = ApplicationSettings.DevOptions.AuthenticatedUser;
         if (string.IsNullOrEmpty(userEmail))
             return Task.FromResult(AuthenticateResult.Fail("Invalid"));
         var claims = new[] { new Claim(ClaimTypes.Name, userEmail) };
@@ -36,6 +33,6 @@ internal class LocalAuthenticationHandler : AuthenticationHandler<Authentication
     {
         await base.HandleChallengeAsync(properties);
         await Response.BodyWriter.WriteAsync(Encoding.UTF8.GetBytes("Status Code: 403; Forbidden \r\n" +
-            "To access protected pages, set 'AuthenticatedUser' to an email address in 'appsettings.Local.json' file."));
+            "To access protected pages, set 'DevOptions.AuthenticatedUser' to an email address in 'appsettings.Development.json' file."));
     }
 }

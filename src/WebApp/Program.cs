@@ -6,7 +6,6 @@ using Microsoft.Identity.Web.UI;
 using WebApp.Platform;
 
 var builder = WebApplication.CreateBuilder(args);
-var isLocal = builder.Environment.IsLocalEnv();
 
 // Bind application settings.
 builder.Configuration.GetSection(nameof(CheckServerSetup.Checks.CheckEmailOptions))
@@ -15,10 +14,11 @@ builder.Configuration.GetSection(nameof(CheckServerSetup.Checks.CheckDatabaseOpt
     .Bind(ApplicationSettings.CheckDatabaseOptions);
 builder.Configuration.GetSection(nameof(CheckServerSetup.Checks.CheckExternalServiceOptions))
     .Bind(ApplicationSettings.CheckExternalServiceOptions);
+builder.Configuration.GetSection(nameof(DevOptions)).Bind(ApplicationSettings.DevOptions);
 ApplicationSettings.ServerName = builder.Configuration.GetValue<string>(nameof(ApplicationSettings.ServerName));
 
 // Configure authentication.
-if (builder.Environment.IsLocalEnv())
+if (ApplicationSettings.DevOptions.UseLocalAuth)
 {
     // When running locally, use a built-in authenticated user.
     builder.Services
@@ -41,7 +41,7 @@ var keysFolder = Path.Combine(builder.Configuration["PersistedFilesBasePath"], "
 builder.Services.AddDataProtection().PersistKeysToFileSystem(Directory.CreateDirectory(keysFolder));
 
 // Configure HSTS (max age: two years).
-if (!isLocal) builder.Services.AddHsts(opts => opts.MaxAge = TimeSpan.FromDays(730));
+if (!builder.Environment.IsDevelopment()) builder.Services.AddHsts(opts => opts.MaxAge = TimeSpan.FromDays(730));
 
 // Configure the UI.
 builder.Services.AddRazorPages().AddMicrosoftIdentityUI();
@@ -60,7 +60,7 @@ if (env.IsProduction())
 }
 else
 {
-    // Staging, Development, or Local
+    // Staging or Development
     app.UseDeveloperExceptionPage();
 }
 
