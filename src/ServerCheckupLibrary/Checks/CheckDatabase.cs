@@ -1,4 +1,4 @@
-using System.Data.SqlClient;
+﻿using System.Data.SqlClient;
 
 namespace CheckServerSetup.Checks;
 
@@ -26,22 +26,38 @@ public static class CheckDatabase
         {
             try
             {
-                await CheckDatabaseConnection(db);
+                await CheckDatabaseConnection(db, true);
                 result.AddMessage(Context.Success,
-                    $"Successfully connected to \"{db.DataSource}\" as user \"{db.UserId}\".");
+                    $"Successfully connected to \"{db.DataSource}\" as user \"{db.UserId}\" using SSL encryption.");
             }
             catch (Exception ex)
             {
                 result.AddMessage(Context.Error,
-                    $"Unable to connect to \"{db.DataSource}\" as user \"{db.UserId}\".",
+                    $"Unable to connect to \"{db.DataSource}\" as user \"{db.UserId}\" using SSL encryption.",
                     ex.GetType().ToString());
+            }
+
+            if (db.AllowInsecureConnection)
+            {
+                try
+                {
+                    await CheckDatabaseConnection(db, false);
+                    result.AddMessage(Context.Success,
+                        $"Successfully connected to \"{db.DataSource}\" as user \"{db.UserId}\" ⚠️ WITHOUT SSL encryption.");
+                }
+                catch (Exception ex)
+                {
+                    result.AddMessage(Context.Error,
+                        $"Unable to connect to \"{db.DataSource}\" as user \"{db.UserId}\" without SSL encryption.",
+                        ex.GetType().ToString());
+                }
             }
         }
 
         return result;
     }
 
-    private static async Task CheckDatabaseConnection(DatabaseConnection db)
+    private static async Task CheckDatabaseConnection(DatabaseConnection db, bool encrypt)
     {
         var builder = new SqlConnectionStringBuilder
         {
@@ -50,6 +66,8 @@ public static class CheckDatabase
             IntegratedSecurity = false,
             UserID = db.UserId,
             Password = db.Password,
+            Encrypt = encrypt,
+            TrustServerCertificate = false,
         };
 
         await using var conn = new SqlConnection(builder.ConnectionString);
@@ -72,4 +90,5 @@ public class DatabaseConnection
     public string InitialCatalog { get; [UsedImplicitly] init; } = "";
     public string UserId { get; [UsedImplicitly] init; } = "";
     public string Password { get; [UsedImplicitly] init; } = "";
+    public bool AllowInsecureConnection { get; [UsedImplicitly] init; }
 }
