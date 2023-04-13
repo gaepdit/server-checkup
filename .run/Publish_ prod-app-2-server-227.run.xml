@@ -1,0 +1,6 @@
+﻿<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Publish: prod-app-2-server-227" type="DotNetMsBuildPublish" factoryName="Publish to IIS" editBeforeRun="true">
+    <riderPublish configuration="Release" platform="Any CPU" publish_profile="prod-app-2-server-227.pubxml" pubxml_path="$PROJECT_DIR$/src/WebApp/Properties/PublishProfiles/prod-app-2-server-227.pubxml" user_name="dwaldron" uuid_high="7322753067386028233" uuid_low="-5405965383996765305" />
+    <method v="2" />
+  </configuration>
+</component>
