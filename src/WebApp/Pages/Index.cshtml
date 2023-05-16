@@ -9,8 +9,9 @@
 }
 
 <h1>@ViewData["Title"]</h1>
+
 <div>
-    <button type="button" class="btn btn-primary" id="check-all">Run all checks</button>
+    <button type="button" class="btn btn-lg btn-primary" id="check-all">Run all checks</button>
 </div>
 
 <div class="card mt-4" id="email-check">
@@ -96,6 +97,13 @@
         }
     </div>
 </div>
+
+@if (Model.InformationalVersion is not null)
+{
+    <div class="mt-4">
+        <small class="text-muted">Server checkup version @Model.InformationalVersion</small>
+    </div>
+}
 
 <partial name="_MessageIconSpritePartial" />
 

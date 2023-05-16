@@ -12,6 +12,8 @@ public class IndexModel : PageModel
     public ResultMessage? ExternalServiceCheckMessage { get; private set; }
     public ResultMessage? DotnetVersionCheckMessage { get; private set; }
 
+    public string? InformationalVersion { get; private set; }
+
     public IActionResult OnGet()
     {
         if (User.Identity is not { IsAuthenticated: true })
@@ -35,6 +37,8 @@ public class IndexModel : PageModel
 
         if (!ApplicationSettings.CheckDotnetVersionOptions.Enabled)
             DotnetVersionCheckMessage = new ResultMessage(Context.Info, ".NET version checks are disabled.");
+
+        InformationalVersion = typeof(IndexModel).Assembly.GetName().Version?.ToString(3);
 
         return Page();
     }
