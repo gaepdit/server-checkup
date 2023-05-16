@@ -1,3 +1,4 @@
+using CheckServerSetup.Checks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.DataProtection;
@@ -8,14 +9,17 @@ using WebApp.Platform;
 var builder = WebApplication.CreateBuilder(args);
 
 // Bind application settings.
-builder.Configuration.GetSection(nameof(CheckServerSetup.Checks.CheckEmailOptions))
+builder.Configuration.GetSection(nameof(CheckEmailOptions))
     .Bind(ApplicationSettings.CheckEmailOptions);
-builder.Configuration.GetSection(nameof(CheckServerSetup.Checks.CheckDatabaseOptions))
+builder.Configuration.GetSection(nameof(CheckDatabaseOptions))
     .Bind(ApplicationSettings.CheckDatabaseOptions);
-builder.Configuration.GetSection(nameof(CheckServerSetup.Checks.CheckExternalServiceOptions))
+builder.Configuration.GetSection(nameof(CheckExternalServiceOptions))
     .Bind(ApplicationSettings.CheckExternalServiceOptions);
+builder.Configuration.GetSection(nameof(CheckDotnetVersionOptions))
+    .Bind(ApplicationSettings.CheckDotnetVersionOptions);
 builder.Configuration.GetSection(nameof(DevOptions)).Bind(ApplicationSettings.DevOptions);
-ApplicationSettings.ServerName = builder.Configuration.GetValue<string>(nameof(ApplicationSettings.ServerName)) ?? "Unknown";
+ApplicationSettings.ServerName =
+    builder.Configuration.GetValue<string>(nameof(ApplicationSettings.ServerName)) ?? "Unknown";
 
 // Configure authentication.
 if (ApplicationSettings.DevOptions.UseLocalAuth)

@@ -7,9 +7,10 @@ namespace WebApp.Pages;
 
 public class IndexModel : PageModel
 {
-    public CheckResult.Message? EmailCheckMessage { get; private set; }
-    public CheckResult.Message? DatabaseCheckMessage { get; private set; }
-    public CheckResult.Message? ExternalServiceCheckMessage { get; private set; }
+    public ResultMessage? EmailCheckMessage { get; private set; }
+    public ResultMessage? DatabaseCheckMessage { get; private set; }
+    public ResultMessage? ExternalServiceCheckMessage { get; private set; }
+    public ResultMessage? DotnetVersionCheckMessage { get; private set; }
 
     public IActionResult OnGet()
     {
@@ -18,19 +19,22 @@ public class IndexModel : PageModel
 
         if (!ApplicationSettings.CheckEmailOptions.Enabled)
         {
-            EmailCheckMessage = new CheckResult.Message(CheckResult.Context.Info, "Email checks are disabled.");
+            EmailCheckMessage = new ResultMessage(Context.Info, "Email checks are disabled.");
         }
         else if (string.IsNullOrEmpty(User.Identity.Name))
         {
-            EmailCheckMessage = new CheckResult.Message(CheckResult.Context.Warning, "No recipient email available.");
+            EmailCheckMessage = new ResultMessage(Context.Warning, "No recipient email available.");
         }
 
         if (!ApplicationSettings.CheckDatabaseOptions.Enabled)
-            DatabaseCheckMessage = new CheckResult.Message(CheckResult.Context.Info, "Database checks are disabled.");
+            DatabaseCheckMessage = new ResultMessage(Context.Info, "Database checks are disabled.");
 
         if (!ApplicationSettings.CheckExternalServiceOptions.Enabled)
             ExternalServiceCheckMessage =
-                new CheckResult.Message(CheckResult.Context.Info, "External service checks are disabled.");
+                new ResultMessage(Context.Info, "External service checks are disabled.");
+
+        if (!ApplicationSettings.CheckDotnetVersionOptions.Enabled)
+            DotnetVersionCheckMessage = new ResultMessage(Context.Info, ".NET version checks are disabled.");
 
         return Page();
     }

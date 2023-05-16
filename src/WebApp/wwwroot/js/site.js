@@ -2,6 +2,7 @@
     prepCheck('#email-check', baseUrl + '/Check?handler=Email');
     prepCheck('#database-check', baseUrl + '/Check?handler=Database');
     prepCheck('#service-check', baseUrl + '/Check?handler=ExternalService');
+    prepCheck('#dotnet-check', baseUrl + '/Check?handler=DotnetVersion');
 
     $('#check-all').click(function () {
         $('.check-btn').click();

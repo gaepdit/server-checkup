@@ -8,7 +8,7 @@ namespace WebApp.Pages;
 [Authorize]
 public class CheckModel : PageModel
 {
-    public CheckResult Result { get; private set; } = null!;
+    public ICheckResult Result { get; private set; } = null!;
 
     public async Task OnGetEmailAsync()
     {
@@ -22,4 +22,7 @@ public class CheckModel : PageModel
 
     public async Task OnGetExternalServiceAsync() =>
         Result = await CheckExternalService.ExecuteAsync(ApplicationSettings.CheckExternalServiceOptions);
+
+    public void OnGetDotnetVersion() =>
+        Result = CheckDotnetVersion.Execute(ApplicationSettings.CheckDotnetVersionOptions);
 }

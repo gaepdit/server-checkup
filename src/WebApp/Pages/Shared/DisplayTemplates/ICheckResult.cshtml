@@ -1,5 +1,4 @@
-﻿@using CheckServerSetup.Checks
-@model CheckServerSetup.Checks.CheckResult?
+﻿@model CheckServerSetup.Checks.ICheckResult?
 
 @if (Model == null)
 {
@@ -8,16 +7,16 @@
 
 @switch (Model.ResultContext)
 {
-    case CheckResult.Context.Success:
+    case CheckServerSetup.Checks.Context.Success:
         <h2 class="text-success">Success</h2>
         break;
-    case CheckResult.Context.Error:
+    case CheckServerSetup.Checks.Context.Error:
         <h2 class="text-danger">Errors occurred</h2>
         break;
-    case CheckResult.Context.Warning:
+    case CheckServerSetup.Checks.Context.Warning:
         <h2 class="text-warning">Issues occurred</h2>
         break;
-    case CheckResult.Context.Info:
+    case CheckServerSetup.Checks.Context.Info:
     default:
         break;
 }
