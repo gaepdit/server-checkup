@@ -127,17 +127,14 @@ public static class CheckEmail
             ? Environment.MachineName
             : $"{options.ServerName} ({Environment.MachineName})";
 
-        using var message = new MailMessage(sender, recipient)
-        {
-            Subject = $"Email test from {serverName}{(enableSsl ? " (SSL enabled)" : string.Empty)}",
-            Body =
-                $"This is a test email sent from {serverName}{(enableSsl ? " (SSL enabled)" : string.Empty)}",
-            SubjectEncoding = Encoding.UTF8,
-            BodyEncoding = Encoding.UTF8,
-        };
+        using var message = new MailMessage(sender, recipient);
+        message.Subject = $"Email test from {serverName}{(enableSsl ? " (SSL enabled)" : string.Empty)}";
+        message.Body = $"This is a test email sent from {serverName}{(enableSsl ? " (SSL enabled)" : string.Empty)}";
+        message.SubjectEncoding = Encoding.UTF8;
+        message.BodyEncoding = Encoding.UTF8;
 
-        using var client = new SmtpClient(options.SmtpHost, enableSsl ? options.SmtpSslPort : options.SmtpPort)
-            { EnableSsl = enableSsl };
+        using var client = new SmtpClient(options.SmtpHost, enableSsl ? options.SmtpSslPort : options.SmtpPort);
+        client.EnableSsl = enableSsl;
         await client.SendMailAsync(message);
     }
 }
