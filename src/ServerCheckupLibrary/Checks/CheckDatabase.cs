@@ -4,7 +4,7 @@ namespace CheckServerSetup.Checks;
 
 public static class CheckDatabase
 {
-    private const string Query = "select 1";
+    private const string Query = "select sysdatetimeoffset();";
 
     public static async Task<CheckResult> ExecuteAsync(CheckDatabaseOptions options)
     {
@@ -40,27 +40,36 @@ public static class CheckDatabase
                 }
             }
 
-            if (options.EncryptionOption != EncryptionOption.RequireValidCertificate)
+            if (options.EncryptionOption == EncryptionOption.RequireValidCertificate) continue;
+
+            try
             {
-                try
+                var response = await CheckDatabaseConnection(db, true);
+                if (string.IsNullOrEmpty(response))
                 {
-                    await CheckDatabaseConnection(db, true);
+                    result.AddMessage(Context.Warning,
+                        $"Successfully connected to \"{db.DataSource}\" as user \"{db.UserId}\". (⚠️ May have used a self-signed certificate.)",
+                        "No data returned from server.");
+                }
+                else
+                {
                     result.AddMessage(Context.Success,
-                        $"Successfully connected to \"{db.DataSource}\" as user \"{db.UserId}\". (⚠️ May have used a self-signed certificate.)");
+                        $"Successfully connected to \"{db.DataSource}\" as user \"{db.UserId}\". (⚠️ May have used a self-signed certificate.)",
+                        $"Server datetime offset: {response}");
                 }
-                catch (Exception ex)
-                {
-                    result.AddMessage(Context.Error,
-                        $"Unable to connect to \"{db.DataSource}\" as user \"{db.UserId}\". [Self-signed certificate allowed.]",
-                        ex.GetType().ToString());
-                }
+            }
+            catch (Exception ex)
+            {
+                result.AddMessage(Context.Error,
+                    $"Unable to connect to \"{db.DataSource}\" as user \"{db.UserId}\". [Self-signed certificate allowed.]",
+                    ex.GetType().ToString());
             }
         }
 
         return result;
     }
 
-    private static async Task CheckDatabaseConnection(DatabaseConnection db, bool trustServerCertificate)
+    private static async Task<string?> CheckDatabaseConnection(DatabaseConnection db, bool trustServerCertificate)
     {
         var builder = new SqlConnectionStringBuilder
         {
@@ -76,8 +85,9 @@ public static class CheckDatabase
         await using var conn = new SqlConnection(builder.ConnectionString);
         await using var command = new SqlCommand(Query, conn);
         await conn.OpenAsync();
-        command.ExecuteScalar();
+        var result = command.ExecuteScalar()?.ToString();
         await conn.CloseAsync();
+        return result;
     }
 }
 
