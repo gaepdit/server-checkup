@@ -23,53 +23,46 @@ public static class CheckDatabase
         }
 
         foreach (var db in options.DatabaseConnections)
-        {
-            if (options.EncryptionOption != EncryptionOption.TrustServerCertificate)
-            {
-                try
-                {
-                    await CheckDatabaseConnection(db, false);
-                    result.AddMessage(Context.Success,
-                        $"Successfully made a secure connection to \"{db.DataSource}\" as user \"{db.UserId}\".");
-                }
-                catch (Exception ex)
-                {
-                    result.AddMessage(Context.Error,
-                        $"Unable to securely connection to \"{db.DataSource}\" as user \"{db.UserId}\".",
-                        ex.GetType().ToString());
-                }
-            }
-
-            if (options.EncryptionOption == EncryptionOption.RequireValidCertificate) continue;
-
-            try
-            {
-                var response = await CheckDatabaseConnection(db, true);
-                if (string.IsNullOrEmpty(response))
-                {
-                    result.AddMessage(Context.Warning,
-                        $"Successfully connected to \"{db.DataSource}\" as user \"{db.UserId}\". (⚠️ May have used a self-signed certificate.)",
-                        "No data returned from server.");
-                }
-                else
-                {
-                    result.AddMessage(Context.Success,
-                        $"Successfully connected to \"{db.DataSource}\" as user \"{db.UserId}\". (⚠️ May have used a self-signed certificate.)",
-                        $"Server datetime offset: {response}");
-                }
-            }
-            catch (Exception ex)
-            {
-                result.AddMessage(Context.Error,
-                    $"Unable to connect to \"{db.DataSource}\" as user \"{db.UserId}\". [Self-signed certificate allowed.]",
-                    ex.GetType().ToString());
-            }
-        }
+            await RecordDatabaseConnectionCheck(db, result);
 
         return result;
     }
 
-    private static async Task<string?> CheckDatabaseConnection(DatabaseConnection db, bool trustServerCertificate)
+    private static async Task RecordDatabaseConnectionCheck(DatabaseConnection db, CheckResult result)
+    {
+        try
+        {
+            var response = await CheckDatabaseConnection(db);
+            if (string.IsNullOrEmpty(response))
+            {
+                result.AddMessage(Context.Warning,
+                    db.TrustServerCertificate
+                        ? $"Successfully connected to \"{db.DataSource}\" as user \"{db.UserId}\". (⚠️ May have used a self-signed certificate.)"
+                        : $"Successfully made a secure connection to \"{db.DataSource}\" as user \"{db.UserId}\".",
+                    string.IsNullOrEmpty(response)
+                        ? "No data returned from server."
+                        : $"Server datetime offset: {response}");
+            }
+            else
+            {
+                result.AddMessage(Context.Success,
+                    db.TrustServerCertificate
+                        ? $"Successfully connected to \"{db.DataSource}\" as user \"{db.UserId}\". (⚠️ May have used a self-signed certificate.)"
+                        : $"Successfully made a secure connection to \"{db.DataSource}\" as user \"{db.UserId}\".",
+                    $"Server datetime offset: {response}");
+            }
+        }
+        catch (Exception ex)
+        {
+            result.AddMessage(Context.Error,
+                db.TrustServerCertificate
+                    ? $"Unable to connect to \"{db.DataSource}\" as user \"{db.UserId}\". [Self-signed certificate allowed.]"
+                    : $"Unable to securely connect to \"{db.DataSource}\" as user \"{db.UserId}\".",
+                ex.GetType().ToString());
+        }
+    }
+
+    private static async Task<string?> CheckDatabaseConnection(DatabaseConnection db)
     {
         var builder = new SqlConnectionStringBuilder
         {
@@ -79,7 +72,7 @@ public static class CheckDatabase
             UserID = db.UserId,
             Password = db.Password,
             Encrypt = true,
-            TrustServerCertificate = trustServerCertificate,
+            TrustServerCertificate = db.TrustServerCertificate,
         };
 
         await using var conn = new SqlConnection(builder.ConnectionString);
@@ -94,7 +87,6 @@ public static class CheckDatabase
 public class CheckDatabaseOptions
 {
     public bool Enabled { get; [UsedImplicitly] init; }
-    public EncryptionOption EncryptionOption { get; [UsedImplicitly] init; }
     public DatabaseConnection[]? DatabaseConnections { get; [UsedImplicitly] init; }
 }
 
@@ -104,25 +96,5 @@ public class DatabaseConnection
     public string InitialCatalog { get; [UsedImplicitly] init; } = "";
     public string UserId { get; [UsedImplicitly] init; } = "";
     public string Password { get; [UsedImplicitly] init; } = "";
-}
-
-/// <summary>
-/// 
-/// </summary>
-public enum EncryptionOption
-{
-    /// <summary>
-    /// Test encrypted database connection and require a valid installed certificate.
-    /// </summary>
-    RequireValidCertificate,
-
-    /// <summary>
-    /// Test encrypted database connection and allow the use of self-signed certificates.
-    /// </summary>
-    TrustServerCertificate,
-
-    /// <summary>
-    /// Test database connection using both scenarios.
-    /// </summary>
-    CheckBoth,
+    public bool TrustServerCertificate { get; [UsedImplicitly] init; }
 }
