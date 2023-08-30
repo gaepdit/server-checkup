@@ -119,12 +119,15 @@
     </div>
 </div>
 
-@if (Model.InformationalVersion is not null)
-{
-    <div class="mt-4">
-        <small class="text-muted">Server checkup version @Model.InformationalVersion</small>
-    </div>
-}
+<div class="mt-4">
+    <small class="text-muted">
+        <a href="https://github.com/gaepdit/server-checkup" target="_blank" rel="noopener">Server Checkup</a>
+        @if (Model.InformationalVersion is not null)
+        {
+            @: | Version @Model.InformationalVersion
+        }
+    </small>
+</div>
 
 <partial name="_MessageIconSpritePartial" />
 
