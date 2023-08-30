@@ -81,7 +81,11 @@ public static class CheckDatabaseEmail
         command.Parameters.Add(new SqlParameter("@from_address", recipient.Address));
         command.Parameters.Add(new SqlParameter("@subject", $"Email test from database {db.DataSource}"));
         command.Parameters.Add(new SqlParameter("@body",
-            $"This is a test email sent from database \"{db.DataSource}\" as user \"{db.UserId}\"."));
+            $"""
+             This is a test email sent from database "{db.DataSource}" as user "{db.UserId}".
+             
+             (Triggered from web server "{Environment.MachineName}".)
+             """));
         command.Parameters.Add(new SqlParameter("@profile_name", options.DbEmailProfileName));
 
         await conn.OpenAsync();
