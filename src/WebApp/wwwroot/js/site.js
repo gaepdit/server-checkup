@@ -1,6 +1,7 @@
 ﻿$(document).ready(function () {
     prepCheck('#email-check', baseUrl + '/Check?handler=Email');
     prepCheck('#database-check', baseUrl + '/Check?handler=Database');
+    prepCheck('#database-email-check', baseUrl + '/Check?handler=DatabaseEmail');
     prepCheck('#service-check', baseUrl + '/Check?handler=ExternalService');
     prepCheck('#dotnet-check', baseUrl + '/Check?handler=DotnetVersion');
 

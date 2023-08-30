@@ -1,4 +1,4 @@
-using CheckServerSetup.Checks;
+﻿using CheckServerSetup.Checks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using WebApp.Platform;
@@ -19,6 +19,13 @@ public class CheckModel : PageModel
 
     public async Task OnGetDatabaseAsync() =>
         Result = await CheckDatabase.ExecuteAsync(ApplicationSettings.CheckDatabaseOptions);
+
+    public async Task OnGetDatabaseEmailAsync()
+    {
+        ApplicationSettings.CheckDatabaseEmailOptions.Recipient = User.Identity?.Name ?? string.Empty;
+        ApplicationSettings.CheckDatabaseEmailOptions.ServerName = ApplicationSettings.ServerName;
+        Result = await CheckDatabaseEmail.ExecuteAsync(ApplicationSettings.CheckDatabaseEmailOptions);
+    }
 
     public async Task OnGetExternalServiceAsync() =>
         Result = await CheckExternalService.ExecuteAsync(ApplicationSettings.CheckExternalServiceOptions);

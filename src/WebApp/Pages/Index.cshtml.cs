@@ -9,6 +9,7 @@ public class IndexModel : PageModel
 {
     public ResultMessage? EmailCheckMessage { get; private set; }
     public ResultMessage? DatabaseCheckMessage { get; private set; }
+    public ResultMessage? DatabaseEmailCheckMessage { get; private set; }
     public ResultMessage? ExternalServiceCheckMessage { get; private set; }
     public ResultMessage? DotnetVersionCheckMessage { get; private set; }
 
@@ -29,14 +30,28 @@ public class IndexModel : PageModel
         }
 
         if (!ApplicationSettings.CheckDatabaseOptions.Enabled)
+        {
             DatabaseCheckMessage = new ResultMessage(Context.Info, "Database checks are disabled.");
+        }
+
+        if (!ApplicationSettings.CheckDatabaseEmailOptions.Enabled)
+        {
+            DatabaseEmailCheckMessage = new ResultMessage(Context.Info, "Database email checks are disabled.");
+        }
+        else if (string.IsNullOrEmpty(User.Identity.Name))
+        {
+            DatabaseEmailCheckMessage = new ResultMessage(Context.Warning, "No recipient email available.");
+        }
 
         if (!ApplicationSettings.CheckExternalServiceOptions.Enabled)
-            ExternalServiceCheckMessage =
-                new ResultMessage(Context.Info, "External service checks are disabled.");
+        {
+            ExternalServiceCheckMessage = new ResultMessage(Context.Info, "External service checks are disabled.");
+        }
 
         if (!ApplicationSettings.CheckDotnetVersionOptions.Enabled)
+        {
             DotnetVersionCheckMessage = new ResultMessage(Context.Info, ".NET version checks are disabled.");
+        }
 
         InformationalVersion = typeof(IndexModel).Assembly.GetName().Version?.ToString(3);
 

@@ -56,6 +56,27 @@
     </div>
 </div>
 
+<div class="card mt-4" id="database-email-check">
+    <div class="card-header">Database email configuration</div>
+    <div class="card-body">
+        @if (Model.DatabaseEmailCheckMessage is not null)
+        {
+            <ul class="list-group">
+                @Html.DisplayFor(m => m.DatabaseEmailCheckMessage)
+            </ul>
+        }
+        else
+        {
+            <button type="button" class="check-btn btn btn-primary">
+                <span class="check-btn-text">Run checks</span>
+                <span class="check-btn-spinner spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                <span class="check-btn-loading d-none">Running...</span>
+            </button>
+            <div class="check-results mt-2"></div>
+        }
+    </div>
+</div>
+
 <div class="card mt-4" id="service-check">
     <div class="card-header">External services</div>
     <div class="card-body">

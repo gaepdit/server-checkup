@@ -13,6 +13,8 @@ builder.Configuration.GetSection(nameof(CheckEmailOptions))
     .Bind(ApplicationSettings.CheckEmailOptions);
 builder.Configuration.GetSection(nameof(CheckDatabaseOptions))
     .Bind(ApplicationSettings.CheckDatabaseOptions);
+builder.Configuration.GetSection(nameof(CheckDatabaseEmailOptions))
+    .Bind(ApplicationSettings.CheckDatabaseEmailOptions);
 builder.Configuration.GetSection(nameof(CheckExternalServiceOptions))
     .Bind(ApplicationSettings.CheckExternalServiceOptions);
 builder.Configuration.GetSection(nameof(CheckDotnetVersionOptions))
