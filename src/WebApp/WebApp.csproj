@@ -26,7 +26,8 @@
             <CopyToPublishDirectory>Never</CopyToPublishDirectory>
             <DependentUpon>appsettings.json</DependentUpon>
         </Content>
-        <None Include="appsettings-example.json" />
+        <Content Update="appsettings-example.json" CopyToPublishDirectory="Never" />
+        <Content Update="libman.json" CopyToPublishDirectory="Never" />
     </ItemGroup>
 
 </Project>
