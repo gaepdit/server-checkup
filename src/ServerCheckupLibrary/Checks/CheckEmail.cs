@@ -8,7 +8,6 @@ public static class CheckEmail
     public static async Task<CheckResult> ExecuteAsync(CheckEmailOptions options)
     {
         var result = new CheckResult();
-        var attempt = true;
 
         if (!options.Enabled)
         {
@@ -16,112 +15,63 @@ public static class CheckEmail
             return result;
         }
 
-        MailAddress? sender = null;
-
-        if (options.SenderEmail == "")
+        if (options.SenderEmail == "" || options.Recipient == "")
         {
-            result.AddMessage(Context.Warning, "No sender email is configured.");
-            attempt = false;
-        }
-        else
-        {
-            try
-            {
-                sender = new MailAddress(options.SenderEmail);
-            }
-            catch (FormatException)
-            {
-                result.AddMessage(Context.Warning,
-                    $"The configured sender email is invalid: \"{options.SenderEmail}\"");
-                attempt = false;
-            }
+            result.AddMessage(Context.Warning, "Email configuration is incomplete.");
+            return result;
         }
 
-        var recipients = new List<MailAddress>();
-
-        if (options.Recipients == null)
+        if (!MailAddress.TryCreate(options.SenderEmail, out var sender))
         {
-            result.AddMessage(Context.Warning, "No recipient emails are configured.");
-            attempt = false;
-        }
-        else
-        {
-            foreach (var recipient in options.Recipients)
-            {
-                try
-                {
-                    recipients.Add(new MailAddress(recipient));
-                }
-                catch (FormatException)
-                {
-                    result.AddMessage(Context.Warning, $"A configured recipient email is invalid: \"{recipient}\"");
-                }
-            }
+            result.AddMessage(Context.Warning,
+                $"The configured sender email is invalid: \"{options.SenderEmail}\"");
+            return result;
         }
 
-        if (recipients.Count == 0)
+        if (!MailAddress.TryCreate(options.Recipient, out var recipient))
         {
-            result.AddMessage(Context.Warning, "Recipient email is missing.");
-            attempt = false;
+            result.AddMessage(Context.Warning,
+                $"The configured recipient email is invalid: \"{options.Recipient}\"");
+            return result;
         }
 
-        if (!attempt) return result;
+        await RecordEmailCheck(options, sender, recipient, result, false);
 
-        foreach (var recipient in recipients)
-        {
-            try
-            {
-                await SendTestEmail(sender!, recipient, options);
-                result.AddMessage(Context.Success,
-                    $"Successfully sent email to \"{recipient}\".", "(Check for receipt).");
-            }
-            catch (SmtpException ex)
-            {
-                result.AddMessage(Context.Error,
-                    $"Unable to send email to \"{recipient}\".",
-                    $"{ex.GetType()}; Status code: {ex.StatusCode.ToString()}");
-            }
-            catch (Exception ex)
-            {
-                result.AddMessage(Context.Error,
-                    $"Unable to send email to \"{recipient}\".",
-                    ex.GetType().ToString());
-            }
-        }
-
-        if (!options.CheckSslEmail) return result;
-
-        foreach (var recipient in recipients)
-        {
-            try
-            {
-                await SendTestEmail(sender!, recipient, options, true);
-                result.AddMessage(Context.Success,
-                    $"Successfully sent email to \"{recipient}\" using SSL.", "(Check for receipt).");
-            }
-            catch (SmtpException ex)
-            {
-                result.AddMessage(Context.Error,
-                    $"Unable to send email to \"{recipient}\" using SSL.",
-                    $"{ex.GetType()}; Status code: {ex.StatusCode.ToString()}");
-            }
-            catch (Exception ex)
-            {
-                result.AddMessage(Context.Error,
-                    $"Unable to send email to \"{recipient}\" using SSL.",
-                    ex.GetType().ToString());
-            }
-        }
+        if (options.CheckSslEmail)
+            await RecordEmailCheck(options, sender, recipient, result, true);
 
         return result;
     }
 
+    private static async Task RecordEmailCheck(CheckEmailOptions options, MailAddress sender, MailAddress recipient,
+        CheckResult result, bool enableSsl)
+    {
+        var sslText = enableSsl ? " using SSL" : "";
 
-    private static async Task SendTestEmail(
-        MailAddress sender,
-        MailAddress recipient,
-        CheckEmailOptions options,
-        bool enableSsl = false)
+        try
+        {
+            await SendTestEmail(sender, recipient, options, enableSsl);
+
+            result.AddMessage(Context.Success,
+                $"Successfully sent email to \"{recipient}\"{sslText}.",
+                "(Check for receipt).");
+        }
+        catch (SmtpException ex)
+        {
+            result.AddMessage(Context.Error,
+                $"Unable to send email to \"{recipient}\"{sslText}.",
+                $"{ex.GetType()}; Status code: {ex.StatusCode.ToString()}");
+        }
+        catch (Exception ex)
+        {
+            result.AddMessage(Context.Error,
+                $"Unable to send email to \"{recipient}\"{sslText}.",
+                ex.GetType().ToString());
+        }
+    }
+
+    private static async Task SendTestEmail(MailAddress sender, MailAddress recipient, CheckEmailOptions options,
+        bool enableSsl)
     {
         var serverName = string.IsNullOrWhiteSpace(options.ServerName)
             ? Environment.MachineName
@@ -143,10 +93,10 @@ public class CheckEmailOptions
 {
     public bool Enabled { get; [UsedImplicitly] init; }
     public string SenderEmail { get; [UsedImplicitly] init; } = "";
+    public string Recipient { get; set; } = "";
+    public string ServerName { get; set; } = string.Empty;
     public string SmtpHost { get; [UsedImplicitly] init; } = "";
     public int SmtpPort { get; [UsedImplicitly] init; }
     public bool CheckSslEmail { get; [UsedImplicitly] set; }
     public int SmtpSslPort { get; [UsedImplicitly] init; }
-    public string[]? Recipients { get; set; }
-    public string ServerName { get; set; } = string.Empty;
 }

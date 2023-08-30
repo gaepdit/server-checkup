@@ -1,4 +1,4 @@
-﻿using CheckServerSetup.Checks;
+using CheckServerSetup.Checks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using WebApp.Platform;
@@ -12,7 +12,7 @@ public class CheckModel : PageModel
 
     public async Task OnGetEmailAsync()
     {
-        ApplicationSettings.CheckEmailOptions.Recipients = new[] { User.Identity?.Name ?? string.Empty };
+        ApplicationSettings.CheckEmailOptions.Recipient = User.Identity?.Name ?? string.Empty;
         ApplicationSettings.CheckEmailOptions.ServerName = ApplicationSettings.ServerName;
         Result = await CheckEmail.ExecuteAsync(ApplicationSettings.CheckEmailOptions);
     }
