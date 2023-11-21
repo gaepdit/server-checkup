@@ -4,9 +4,16 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
+using System.Runtime.InteropServices;
 using WebApp.Platform;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Persist data protection keys
+var keysFolder = Path.Combine(builder.Configuration["PersistedFilesBasePath"] ?? "./", "DataProtectionKeys");
+var dataProtectionBuilder = builder.Services.AddDataProtection().PersistKeysToFileSystem(Directory.CreateDirectory(keysFolder));
+if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+    dataProtectionBuilder.ProtectKeysWithDpapi(protectToLocalMachine: true);
 
 // Bind application settings.
 builder.Configuration.GetSection(nameof(CheckEmailOptions))
@@ -41,10 +48,6 @@ else
 }
 
 builder.Services.AddAuthorization();
-
-// Persist data protection keys.
-var keysFolder = Path.Combine(builder.Configuration["PersistedFilesBasePath"] ?? "./", "DataProtectionKeys");
-builder.Services.AddDataProtection().PersistKeysToFileSystem(Directory.CreateDirectory(keysFolder));
 
 // Configure HSTS (max age: two years).
 if (!builder.Environment.IsDevelopment()) builder.Services.AddHsts(opts => opts.MaxAge = TimeSpan.FromDays(730));
