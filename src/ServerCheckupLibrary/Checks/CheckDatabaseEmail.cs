@@ -16,8 +16,8 @@ public static class CheckDatabaseEmail
             return result;
         }
 
-        if (options.DatabaseConnection is null ||
-            string.IsNullOrEmpty(options.DbEmailProfileName) ||
+        if (options.DatabaseConnections is null ||
+            options.DatabaseConnections.Length == 0 ||
             string.IsNullOrEmpty(options.Recipient))
         {
             result.AddMessage(Context.Warning, "Database email configuration is incomplete.");
@@ -31,35 +31,38 @@ public static class CheckDatabaseEmail
             return result;
         }
 
-        await RecordDatabaseEmailCheck(options, recipient, result);
+        foreach (var db in options.DatabaseConnections)
+            await RecordDatabaseEmailCheck(db, recipient, result);
 
         return result;
     }
 
-    private static async Task RecordDatabaseEmailCheck(CheckDatabaseEmailOptions options, MailAddress recipient,
-        CheckResult result)
+    private static async Task RecordDatabaseEmailCheck(DatabaseConnection db, MailAddress recipient, CheckResult result)
     {
-        var db = options.DatabaseConnection!;
-
         try
         {
-            await SendEmailFromDatabase(options, recipient);
+            await SendEmailFromDatabase(db, recipient);
 
             result.AddMessage(Context.Success,
-                $"Successfully sent email from \"{db.DataSource}\" as user \"{db.UserId}\".",
+                $"""
+                 Successfully sent email from "{db.DataSource}" as user "{db.UserId}" using the
+                 "{db.DbEmailProfileName}" profile.
+                 """,
                 "(Check for receipt).");
         }
         catch (Exception ex)
         {
             result.AddMessage(Context.Error,
-                $"Unable to send email from \"{db.DataSource}\" as user \"{db.UserId}\".",
+                $"""
+                 Unable to send email from "{db.DataSource}" as user "{db.UserId}" using the
+                 "{db.DbEmailProfileName}" profile.
+                 """,
                 ex.GetType().ToString());
         }
     }
 
-    private static async Task SendEmailFromDatabase(CheckDatabaseEmailOptions options, MailAddress recipient)
+    private static async Task SendEmailFromDatabase(DatabaseConnection db, MailAddress recipient)
     {
-        var db = options.DatabaseConnection!;
         const string spName = "msdb.dbo.sp_send_dbmail";
 
         var builder = new SqlConnectionStringBuilder
@@ -78,15 +81,14 @@ public static class CheckDatabaseEmail
 
         command.CommandType = CommandType.StoredProcedure;
         command.Parameters.Add(new SqlParameter("@recipients", recipient.Address));
-        command.Parameters.Add(new SqlParameter("@from_address", recipient.Address));
         command.Parameters.Add(new SqlParameter("@subject", $"Email test from database {db.DataSource}"));
         command.Parameters.Add(new SqlParameter("@body",
             $"""
              This is a test email sent from database "{db.DataSource}" as user "{db.UserId}".
-             
+
              (Triggered from web server "{Environment.MachineName}".)
              """));
-        command.Parameters.Add(new SqlParameter("@profile_name", options.DbEmailProfileName));
+        command.Parameters.Add(new SqlParameter("@profile_name", db.DbEmailProfileName));
 
         await conn.OpenAsync();
         command.ExecuteNonQuery();
@@ -97,8 +99,6 @@ public static class CheckDatabaseEmail
 public class CheckDatabaseEmailOptions
 {
     public bool Enabled { get; [UsedImplicitly] init; }
-    public DatabaseConnection? DatabaseConnection { get; [UsedImplicitly] init; }
-    public string DbEmailProfileName { get; [UsedImplicitly] init; } = "";
+    public DatabaseConnection[]? DatabaseConnections { get; [UsedImplicitly] init; }
     public string Recipient { get; set; } = "";
-    public string ServerName { get; set; } = string.Empty;
 }

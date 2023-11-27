@@ -97,4 +97,5 @@ public class DatabaseConnection
     public string UserId { get; [UsedImplicitly] init; } = "";
     public string Password { get; [UsedImplicitly] init; } = "";
     public bool TrustServerCertificate { get; [UsedImplicitly] init; }
+    public string DbEmailProfileName { get; [UsedImplicitly] init; } = "";
 }

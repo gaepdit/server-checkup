@@ -23,7 +23,6 @@ public class CheckModel : PageModel
     public async Task OnGetDatabaseEmailAsync()
     {
         ApplicationSettings.CheckDatabaseEmailOptions.Recipient = User.Identity?.Name ?? string.Empty;
-        ApplicationSettings.CheckDatabaseEmailOptions.ServerName = ApplicationSettings.ServerName;
         Result = await CheckDatabaseEmail.ExecuteAsync(ApplicationSettings.CheckDatabaseEmailOptions);
     }
 
