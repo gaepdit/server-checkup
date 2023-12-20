@@ -4,14 +4,17 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
+using Mindscape.Raygun4Net.AspNetCore;
 using System.Runtime.InteropServices;
 using WebApp.Platform;
+using WebApp.Platform.Raygun;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Persist data protection keys
 var keysFolder = Path.Combine(builder.Configuration["PersistedFilesBasePath"] ?? "./", "DataProtectionKeys");
-var dataProtectionBuilder = builder.Services.AddDataProtection().PersistKeysToFileSystem(Directory.CreateDirectory(keysFolder));
+var dataProtectionBuilder =
+    builder.Services.AddDataProtection().PersistKeysToFileSystem(Directory.CreateDirectory(keysFolder));
 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
     dataProtectionBuilder.ProtectKeysWithDpapi(protectToLocalMachine: true);
 
@@ -29,6 +32,8 @@ builder.Configuration.GetSection(nameof(CheckDotnetVersionOptions))
 builder.Configuration.GetSection(nameof(DevOptions)).Bind(ApplicationSettings.DevOptions);
 ApplicationSettings.ServerName =
     builder.Configuration.GetValue<string>(nameof(ApplicationSettings.ServerName)) ?? "Unknown";
+builder.Configuration.GetSection(nameof(ApplicationSettings.RaygunSettings))
+    .Bind(ApplicationSettings.RaygunSettings);
 
 // Configure authentication.
 if (ApplicationSettings.DevOptions.UseLocalAuth)
@@ -52,27 +57,27 @@ builder.Services.AddAuthorization();
 // Configure HSTS (max age: two years).
 if (!builder.Environment.IsDevelopment()) builder.Services.AddHsts(opts => opts.MaxAge = TimeSpan.FromDays(730));
 
+// Configure application monitoring.
+if (!string.IsNullOrEmpty(ApplicationSettings.RaygunSettings.ApiKey))
+{
+    builder.Services.AddRaygun(builder.Configuration,
+        new RaygunMiddlewareSettings { ClientProvider = new RaygunClientProvider() });
+    builder.Services.AddHttpContextAccessor(); // needed by RaygunScriptPartial
+}
+
 // Configure the UI.
 builder.Services.AddRazorPages().AddMicrosoftIdentityUI();
 builder.Services.AddWebOptimizer();
 
 // Build the application.
 var app = builder.Build();
-var env = app.Environment;
+
+// Configure error handling.
+if (app.Environment.IsDevelopment()) app.UseDeveloperExceptionPage(); // Development
+else app.UseExceptionHandler("/Error"); // Production or Staging
 
 // Configure the HTTP request pipeline.
-if (env.IsProduction())
-{
-    // Production
-    app.UseExceptionHandler("/Error");
-    app.UseHsts();
-}
-else
-{
-    // Staging or Development
-    app.UseDeveloperExceptionPage();
-}
-
+if (!string.IsNullOrEmpty(ApplicationSettings.RaygunSettings.ApiKey)) app.UseRaygun();
 app.UseStatusCodePages();
 app.UseHttpsRedirection();
 app.UseWebOptimizer();

@@ -1,5 +1,4 @@
 ﻿using CheckServerSetup.Checks;
-using JetBrains.Annotations;
 
 namespace WebApp.Platform;
 
@@ -12,6 +11,14 @@ public static class ApplicationSettings
     public static CheckDotnetVersionOptions CheckDotnetVersionOptions { get; } = new();
     public static string ServerName { get; set; } = string.Empty;
     public static DevOptions DevOptions { get; } = new();
+
+    // Raygun client settings
+    public static RaygunClientSettings RaygunSettings { get; } = new();
+
+    public class RaygunClientSettings
+    {
+        public string? ApiKey { get; [UsedImplicitly] init; }
+    }
 }
 
 public class DevOptions
