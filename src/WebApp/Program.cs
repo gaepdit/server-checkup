@@ -49,7 +49,7 @@ else
     // When running on the server, require an Azure AD login account (configured in the app settings file).
     builder.Services
         .AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-        .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
+        .AddMicrosoftIdentityWebApp(builder.Configuration);
 }
 
 builder.Services.AddAuthorization();
@@ -102,4 +102,4 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapRazorPages();
 
-app.Run();
+await app.RunAsync();
