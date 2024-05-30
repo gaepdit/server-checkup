@@ -98,7 +98,7 @@ public static class CheckDatabaseEmail
 
 public class CheckDatabaseEmailOptions
 {
-    public bool Enabled { get; [UsedImplicitly] init; }
-    public DatabaseConnection[]? DatabaseConnections { get; [UsedImplicitly] init; }
+    public bool Enabled { get;  init; }
+    public DatabaseConnection[]? DatabaseConnections { get;  init; }
     public string Recipient { get; set; } =string.Empty;
 }

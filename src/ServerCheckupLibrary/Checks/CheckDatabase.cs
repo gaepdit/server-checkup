@@ -64,7 +64,7 @@ public static class CheckDatabase
     private static async Task<string?> CheckDatabaseConnection(DatabaseConnection db)
     {
         if (db.Vendor == "Oracle") return await CheckOracleDatabaseConnection(db);
-        
+
         var builder = new SqlConnectionStringBuilder
         {
             DataSource = db.DataSource,
@@ -102,20 +102,19 @@ public static class CheckDatabase
     }
 }
 
-
 public class CheckDatabaseOptions
 {
-    public bool Enabled { get; [UsedImplicitly] init; }
-    public DatabaseConnection[]? DatabaseConnections { get; [UsedImplicitly] init; }
+    public bool Enabled { get; init; }
+    public DatabaseConnection[]? DatabaseConnections { get; init; }
 }
 
 public class DatabaseConnection
 {
-    public string Vendor { get; [UsedImplicitly] init; } = string.Empty;
-    public string DataSource { get; [UsedImplicitly] init; } = string.Empty;
-    public string InitialCatalog { get; [UsedImplicitly] init; } = string.Empty;
-    public string UserId { get; [UsedImplicitly] init; } = string.Empty;
-    public string Password { get; [UsedImplicitly] init; } = string.Empty;
-    public bool TrustServerCertificate { get; [UsedImplicitly] init; }
-    public string DbEmailProfileName { get; [UsedImplicitly] init; } = string.Empty;
+    public string Vendor { get; init; } = string.Empty;
+    public string DataSource { get; init; } = string.Empty;
+    public string InitialCatalog { get; init; } = string.Empty;
+    public string UserId { get; init; } = string.Empty;
+    public string Password { get; init; } = string.Empty;
+    public bool TrustServerCertificate { get; init; }
+    public string DbEmailProfileName { get; init; } = string.Empty;
 }

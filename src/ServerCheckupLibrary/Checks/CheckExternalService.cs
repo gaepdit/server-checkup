@@ -57,6 +57,6 @@ public static class CheckExternalService
 
 public class CheckExternalServiceOptions
 {
-    public bool Enabled { get; [UsedImplicitly] init; }
-    public string[]? ExternalServices { get; [UsedImplicitly] init; }
+    public bool Enabled { get;  init; }
+    public string[]? ExternalServices { get;  init; }
 }

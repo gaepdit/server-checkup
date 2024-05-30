@@ -91,12 +91,12 @@ public static class CheckEmail
 
 public class CheckEmailOptions
 {
-    public bool Enabled { get; [UsedImplicitly] init; }
-    public string SenderEmail { get; [UsedImplicitly] init; } =string.Empty;
+    public bool Enabled { get;  init; }
+    public string SenderEmail { get;  init; } =string.Empty;
     public string Recipient { get; set; } =string.Empty;
     public string ServerName { get; set; } = string.Empty;
-    public string SmtpHost { get; [UsedImplicitly] init; } =string.Empty;
-    public int SmtpPort { get; [UsedImplicitly] init; }
-    public bool CheckSslEmail { get; [UsedImplicitly] set; }
-    public int SmtpSslPort { get; [UsedImplicitly] init; }
+    public string SmtpHost { get;  init; } =string.Empty;
+    public int SmtpPort { get;  init; }
+    public bool CheckSslEmail { get;  set; }
+    public int SmtpSslPort { get;  init; }
 }

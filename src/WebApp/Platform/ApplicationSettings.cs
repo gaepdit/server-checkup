@@ -17,12 +17,12 @@ public static class ApplicationSettings
 
     public class RaygunClientSettings
     {
-        public string? ApiKey { get; [UsedImplicitly] init; }
+        public string? ApiKey { get; init; }
     }
 }
 
 public class DevOptions
 {
-    public bool UseLocalAuth { get; [UsedImplicitly] init; }
-    public string? AuthenticatedUser { get; [UsedImplicitly] init; }
+    public bool UseLocalAuth { get; init; }
+    public string? AuthenticatedUser { get; init; }
 }
