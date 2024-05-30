@@ -77,7 +77,7 @@ public static class CheckDatabase
         };
 
         await using var conn = new SqlConnection(builder.ConnectionString);
-        await using var command = new SqlCommand(cmdText: "select 1", conn);
+        await using var command = new SqlCommand(cmdText: "select sysdatetimeoffset()", conn);
         await conn.OpenAsync();
         var result = command.ExecuteScalar()?.ToString();
         await conn.CloseAsync();
@@ -94,7 +94,7 @@ public static class CheckDatabase
         };
 
         await using var conn = new OracleConnection(builder.ConnectionString);
-        await using var command = new OracleCommand(cmdText: "SELECT 1 FROM DUAL", conn);
+        await using var command = new OracleCommand(cmdText: "SELECT systimestamp FROM dual", conn);
         await conn.OpenAsync();
         var result = command.ExecuteScalar()?.ToString();
         await conn.CloseAsync();
