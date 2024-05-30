@@ -1,4 +1,4 @@
-namespace CheckServerSetup.Checks;
+namespace ServerCheckupLibrary;
 
 public interface ICheckResult
 {

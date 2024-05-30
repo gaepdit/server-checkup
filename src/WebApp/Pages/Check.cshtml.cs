@@ -1,6 +1,7 @@
-﻿using CheckServerSetup.Checks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using ServerCheckupLibrary;
+using ServerCheckupLibrary.Checks;
 using WebApp.Platform;
 
 namespace WebApp.Pages;

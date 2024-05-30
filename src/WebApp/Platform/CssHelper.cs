@@ -1,4 +1,4 @@
-﻿using CheckServerSetup.Checks;
+﻿using ServerCheckupLibrary;
 
 namespace WebApp.Platform;
 

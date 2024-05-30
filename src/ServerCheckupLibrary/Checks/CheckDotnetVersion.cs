@@ -1,7 +1,7 @@
 using Microsoft.Win32;
 using System.Runtime.InteropServices;
 
-namespace CheckServerSetup.Checks;
+namespace ServerCheckupLibrary.Checks;
 
 public static class CheckDotnetVersion
 {

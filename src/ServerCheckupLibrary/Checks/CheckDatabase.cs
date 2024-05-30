@@ -1,6 +1,6 @@
 ﻿using System.Data.SqlClient;
 
-namespace CheckServerSetup.Checks;
+namespace ServerCheckupLibrary.Checks;
 
 public static class CheckDatabase
 {

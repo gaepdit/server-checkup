@@ -1,7 +1,7 @@
 using System.Net.Mail;
 using System.Text;
 
-namespace CheckServerSetup.Checks;
+namespace ServerCheckupLibrary.Checks;
 
 public static class CheckEmail
 {
