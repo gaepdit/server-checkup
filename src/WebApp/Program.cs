@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
+using Mindscape.Raygun4Net;
 using Mindscape.Raygun4Net.AspNetCore;
 using System.Runtime.InteropServices;
 using WebApp.Platform;
-using WebApp.Platform.Raygun;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,7 +49,7 @@ else
     // When running on the server, require an Azure AD login account (configured in the app settings file).
     builder.Services
         .AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-        .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
+        .AddMicrosoftIdentityWebApp(builder.Configuration);
 }
 
 builder.Services.AddAuthorization();
@@ -60,8 +60,23 @@ if (!builder.Environment.IsDevelopment()) builder.Services.AddHsts(opts => opts.
 // Configure application monitoring.
 if (!string.IsNullOrEmpty(ApplicationSettings.RaygunSettings.ApiKey))
 {
-    builder.Services.AddRaygun(builder.Configuration,
-        new RaygunMiddlewareSettings { ClientProvider = new RaygunClientProvider() });
+    // Add error logging
+    builder.Services.AddSingleton(s =>
+    {
+        var client = new RaygunClient(s.GetService<RaygunSettings>()!, s.GetService<IRaygunUserProvider>()!);
+        client.SendingMessage += (_, eventArgs) =>
+        {
+            eventArgs.Message.Details.Tags.Add(builder.Environment.EnvironmentName);
+        };
+        return client;
+    });
+    builder.Services.AddRaygun(builder.Configuration, opts =>
+    {
+        opts.ApiKey = ApplicationSettings.RaygunSettings.ApiKey;
+        opts.ExcludeErrorsFromLocal = false;
+        opts.IgnoreFormFieldNames = ["*Password"];
+    });
+    builder.Services.AddRaygunUserProvider();
     builder.Services.AddHttpContextAccessor(); // needed by RaygunScriptPartial
 }
 
@@ -87,4 +102,4 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapRazorPages();
 
-app.Run();
+await app.RunAsync();
