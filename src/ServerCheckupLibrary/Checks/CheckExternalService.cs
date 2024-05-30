@@ -1,6 +1,6 @@
 using System.Net.Sockets;
 
-namespace CheckServerSetup.Checks;
+namespace ServerCheckupLibrary.Checks;
 
 public static class CheckExternalService
 {

@@ -1,4 +1,3 @@
-using CheckServerSetup.Checks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.DataProtection;
@@ -6,6 +5,7 @@ using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using Mindscape.Raygun4Net;
 using Mindscape.Raygun4Net.AspNetCore;
+using ServerCheckupLibrary.Checks;
 using System.Runtime.InteropServices;
 using WebApp.Platform;
 

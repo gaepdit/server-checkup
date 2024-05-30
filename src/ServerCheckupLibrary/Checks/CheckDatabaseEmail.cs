@@ -2,7 +2,7 @@
 using System.Data.SqlClient;
 using System.Net.Mail;
 
-namespace CheckServerSetup.Checks;
+namespace ServerCheckupLibrary.Checks;
 
 public static class CheckDatabaseEmail
 {
@@ -100,5 +100,5 @@ public class CheckDatabaseEmailOptions
 {
     public bool Enabled { get; [UsedImplicitly] init; }
     public DatabaseConnection[]? DatabaseConnections { get; [UsedImplicitly] init; }
-    public string Recipient { get; set; } = "";
+    public string Recipient { get; set; } =string.Empty;
 }

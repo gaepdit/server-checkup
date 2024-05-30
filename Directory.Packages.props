@@ -8,6 +8,7 @@
     <PackageVersion Include="Microsoft.Identity.Web.UI" Version="2.19.0" />
     <PackageVersion Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
     <PackageVersion Include="Mindscape.Raygun4Net.AspNetCore" Version="10.1.2" />
+    <PackageVersion Include="Oracle.ManagedDataAccess.Core" Version="23.4.0" />
     <PackageVersion Include="SonarAnalyzer.CSharp" Version="9.25.1.91650">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
