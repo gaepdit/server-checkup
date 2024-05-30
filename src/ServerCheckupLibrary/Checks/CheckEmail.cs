@@ -15,7 +15,7 @@ public static class CheckEmail
             return result;
         }
 
-        if (options.SenderEmail == "" || options.Recipient == "")
+        if (string.IsNullOrEmpty(options.SenderEmail)|| string.IsNullOrEmpty(options.Recipient ))
         {
             result.AddMessage(Context.Warning, "Email configuration is incomplete.");
             return result;
@@ -92,10 +92,10 @@ public static class CheckEmail
 public class CheckEmailOptions
 {
     public bool Enabled { get; [UsedImplicitly] init; }
-    public string SenderEmail { get; [UsedImplicitly] init; } = "";
-    public string Recipient { get; set; } = "";
+    public string SenderEmail { get; [UsedImplicitly] init; } =string.Empty;
+    public string Recipient { get; set; } =string.Empty;
     public string ServerName { get; set; } = string.Empty;
-    public string SmtpHost { get; [UsedImplicitly] init; } = "";
+    public string SmtpHost { get; [UsedImplicitly] init; } =string.Empty;
     public int SmtpPort { get; [UsedImplicitly] init; }
     public bool CheckSslEmail { get; [UsedImplicitly] set; }
     public int SmtpSslPort { get; [UsedImplicitly] init; }

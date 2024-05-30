@@ -100,5 +100,5 @@ public class CheckDatabaseEmailOptions
 {
     public bool Enabled { get; [UsedImplicitly] init; }
     public DatabaseConnection[]? DatabaseConnections { get; [UsedImplicitly] init; }
-    public string Recipient { get; set; } = "";
+    public string Recipient { get; set; } =string.Empty;
 }

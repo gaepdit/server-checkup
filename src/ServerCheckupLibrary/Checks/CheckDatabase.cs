@@ -1,11 +1,10 @@
-﻿using System.Data.SqlClient;
+﻿using Oracle.ManagedDataAccess.Client;
+using System.Data.SqlClient;
 
 namespace ServerCheckupLibrary.Checks;
 
 public static class CheckDatabase
 {
-    private const string Query = "select sysdatetimeoffset();";
-
     public static async Task<CheckResult> ExecuteAsync(CheckDatabaseOptions options)
     {
         var result = new CheckResult();
@@ -64,6 +63,8 @@ public static class CheckDatabase
 
     private static async Task<string?> CheckDatabaseConnection(DatabaseConnection db)
     {
+        if (db.Vendor == "Oracle") return await CheckOracleDatabaseConnection(db);
+        
         var builder = new SqlConnectionStringBuilder
         {
             DataSource = db.DataSource,
@@ -76,13 +77,31 @@ public static class CheckDatabase
         };
 
         await using var conn = new SqlConnection(builder.ConnectionString);
-        await using var command = new SqlCommand(Query, conn);
+        await using var command = new SqlCommand(cmdText: "select 1", conn);
+        await conn.OpenAsync();
+        var result = command.ExecuteScalar()?.ToString();
+        await conn.CloseAsync();
+        return result;
+    }
+
+    private static async Task<string?> CheckOracleDatabaseConnection(DatabaseConnection db)
+    {
+        var builder = new OracleConnectionStringBuilder
+        {
+            DataSource = db.DataSource,
+            UserID = db.UserId,
+            Password = db.Password,
+        };
+
+        await using var conn = new OracleConnection(builder.ConnectionString);
+        await using var command = new OracleCommand(cmdText: "SELECT 1 FROM DUAL", conn);
         await conn.OpenAsync();
         var result = command.ExecuteScalar()?.ToString();
         await conn.CloseAsync();
         return result;
     }
 }
+
 
 public class CheckDatabaseOptions
 {
@@ -92,10 +111,11 @@ public class CheckDatabaseOptions
 
 public class DatabaseConnection
 {
-    public string DataSource { get; [UsedImplicitly] init; } = "";
-    public string InitialCatalog { get; [UsedImplicitly] init; } = "";
-    public string UserId { get; [UsedImplicitly] init; } = "";
-    public string Password { get; [UsedImplicitly] init; } = "";
+    public string Vendor { get; [UsedImplicitly] init; } = string.Empty;
+    public string DataSource { get; [UsedImplicitly] init; } = string.Empty;
+    public string InitialCatalog { get; [UsedImplicitly] init; } = string.Empty;
+    public string UserId { get; [UsedImplicitly] init; } = string.Empty;
+    public string Password { get; [UsedImplicitly] init; } = string.Empty;
     public bool TrustServerCertificate { get; [UsedImplicitly] init; }
-    public string DbEmailProfileName { get; [UsedImplicitly] init; } = "";
+    public string DbEmailProfileName { get; [UsedImplicitly] init; } = string.Empty;
 }

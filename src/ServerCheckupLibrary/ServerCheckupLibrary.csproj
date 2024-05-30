@@ -8,6 +8,7 @@
 
     <ItemGroup>
         <PackageReference Include="JetBrains.Annotations" />
+        <PackageReference Include="Oracle.ManagedDataAccess.Core" />
         <PackageReference Include="System.Data.SqlClient" />
     </ItemGroup>
 
