@@ -1,5 +1,5 @@
 ﻿using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Net.Mail;
 
 namespace ServerCheckupLibrary.Checks;
@@ -91,14 +91,14 @@ public static class CheckDatabaseEmail
         command.Parameters.Add(new SqlParameter("@profile_name", db.DbEmailProfileName));
 
         await conn.OpenAsync();
-        command.ExecuteNonQuery();
+        await command.ExecuteNonQueryAsync();
         await conn.CloseAsync();
     }
 }
 
 public class CheckDatabaseEmailOptions
 {
-    public bool Enabled { get;  init; }
-    public DatabaseConnection[]? DatabaseConnections { get;  init; }
-    public string Recipient { get; set; } =string.Empty;
+    public bool Enabled { get; init; }
+    public DatabaseConnection[]? DatabaseConnections { get; init; }
+    public string Recipient { get; set; } = string.Empty;
 }

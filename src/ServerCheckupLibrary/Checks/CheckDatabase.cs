@@ -1,5 +1,5 @@
 ﻿using Oracle.ManagedDataAccess.Client;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 
 namespace ServerCheckupLibrary.Checks;
 
@@ -79,7 +79,7 @@ public static class CheckDatabase
         await using var conn = new SqlConnection(builder.ConnectionString);
         await using var command = new SqlCommand(cmdText: "select sysdatetimeoffset()", conn);
         await conn.OpenAsync();
-        var result = command.ExecuteScalar()?.ToString();
+        var result = (await command.ExecuteScalarAsync())?.ToString();
         await conn.CloseAsync();
         return result;
     }
@@ -96,7 +96,7 @@ public static class CheckDatabase
         await using var conn = new OracleConnection(builder.ConnectionString);
         await using var command = new OracleCommand(cmdText: "SELECT systimestamp FROM dual", conn);
         await conn.OpenAsync();
-        var result = command.ExecuteScalar()?.ToString();
+        var result = (await command.ExecuteScalarAsync())?.ToString();
         await conn.CloseAsync();
         return result;
     }
