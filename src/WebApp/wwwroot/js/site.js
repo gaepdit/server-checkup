@@ -1,48 +1,54 @@
-﻿$(document).ready(function () {
+﻿"use strict";
+document.addEventListener('DOMContentLoaded', function () {
     prepCheck('#email-check', baseUrl + '/Check?handler=Email');
     prepCheck('#database-check', baseUrl + '/Check?handler=Database');
     prepCheck('#database-email-check', baseUrl + '/Check?handler=DatabaseEmail');
     prepCheck('#service-check', baseUrl + '/Check?handler=ExternalService');
     prepCheck('#dotnet-check', baseUrl + '/Check?handler=DotnetVersion');
 
-    $('#check-all').click(function () {
-        $('.check-btn').click();
+    document.querySelector('#check-all').addEventListener('click', function () {
+        document.querySelectorAll('.check-btn').forEach(function (btn) {
+            btn.click();
+        });
     });
 });
 
 function prepCheck(checkSectionId, endPoint) {
-    const checkEl = $(checkSectionId);
-    const buttonEl = checkEl.find('button').first();
-    const resultsEl = checkEl.find('.check-results').first();
+    const checkEl = document.querySelector(checkSectionId);
+    const buttonEl = checkEl.querySelector('button');
+    const resultsEl = checkEl.querySelector('.check-results');
 
-    buttonEl.click(function () {
-        resultsEl.empty();
+    buttonEl.addEventListener('click', function () {
+        resultsEl.innerHTML = '';
         setAsLoading(buttonEl);
-        $.ajax({
-            type: "Get",
-            url: endPoint,
-            success: function (result) {
+        fetch(endPoint)
+            .then(response => response.text())
+            .then(result => {
                 resetAsLoading(buttonEl);
-                resultsEl.html(result);
-            },
-            error(msg) {
+                resultsEl.innerHTML = result;
+            })
+            .catch(error => {
                 resetAsLoading(buttonEl);
-                resultsEl.html(msg);
-            }
-        });
+                resultsEl.innerHTML = error;
+                if (error instanceof Error) {
+                    rg4js('send', {error: error, tags: ['handled_promise_rejection']});
+                } else {
+                    console.error(error);
+                }
+            });
     });
 }
 
 function setAsLoading(btnEl) {
-    btnEl.prop('disabled', true);
-    btnEl.find('.check-btn-text').first().addClass('d-none');
-    btnEl.find('.check-btn-spinner').first().removeClass('d-none');
-    btnEl.find('.check-btn-loading').first().removeClass('d-none');
+    btnEl.setAttribute('disabled', true);
+    btnEl.querySelector('.check-btn-text').classList.add('d-none');
+    btnEl.querySelector('.check-btn-spinner').classList.remove('d-none');
+    btnEl.querySelector('.check-btn-loading').classList.remove('d-none');
 }
 
 function resetAsLoading(btnEl) {
-    btnEl.prop('disabled', false);
-    btnEl.find('.check-btn-text').first().removeClass('d-none');
-    btnEl.find('.check-btn-spinner').first().addClass('d-none');
-    btnEl.find('.check-btn-loading').first().addClass('d-none');
+    btnEl.removeAttribute('disabled');
+    btnEl.querySelector('.check-btn-text').classList.remove('d-none');
+    btnEl.querySelector('.check-btn-spinner').classList.add('d-none');
+    btnEl.querySelector('.check-btn-loading').classList.add('d-none');
 }
