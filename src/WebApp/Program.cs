@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using WebApp.Platform;
 
 var builder = WebApplication.CreateBuilder(args);
+var isDevelopment = builder.Environment.IsDevelopment();
 
 // Persist data protection keys
 var keysFolder = Path.Combine(builder.Configuration["PersistedFilesBasePath"] ?? "./", "DataProtectionKeys");
@@ -55,7 +56,7 @@ else
 builder.Services.AddAuthorization();
 
 // Configure HSTS (max age: two years).
-if (!builder.Environment.IsDevelopment()) builder.Services.AddHsts(opts => opts.MaxAge = TimeSpan.FromDays(730));
+if (!isDevelopment) builder.Services.AddHsts(opts => opts.MaxAge = TimeSpan.FromDays(730));
 
 // Configure application monitoring.
 if (!string.IsNullOrEmpty(ApplicationSettings.RaygunSettings.ApiKey))
@@ -82,13 +83,13 @@ if (!string.IsNullOrEmpty(ApplicationSettings.RaygunSettings.ApiKey))
 
 // Configure the UI.
 builder.Services.AddRazorPages().AddMicrosoftIdentityUI();
-builder.Services.AddWebOptimizer();
+builder.Services.AddWebOptimizer(minifyJavaScript: !isDevelopment);
 
 // Build the application.
 var app = builder.Build();
 
 // Configure error handling.
-if (app.Environment.IsDevelopment()) app.UseDeveloperExceptionPage(); // Development
+if (isDevelopment) app.UseDeveloperExceptionPage(); // Development
 else app.UseExceptionHandler("/Error"); // Production or Staging
 
 // Configure the HTTP request pipeline.
