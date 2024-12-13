@@ -6,6 +6,7 @@ using Microsoft.Identity.Web.UI;
 using Mindscape.Raygun4Net;
 using Mindscape.Raygun4Net.AspNetCore;
 using ServerCheckupLibrary.Checks;
+using ServerCheckupLibrary.Hubs;
 using System.Runtime.InteropServices;
 using WebApp.Platform;
 
@@ -55,6 +56,9 @@ else
 
 builder.Services.AddAuthorization();
 
+// Add SignalR
+builder.Services.AddSignalR();
+
 // Configure HSTS (max age: two years).
 if (!isDevelopment) builder.Services.AddHsts(opts => opts.MaxAge = TimeSpan.FromDays(730));
 
@@ -62,23 +66,24 @@ if (!isDevelopment) builder.Services.AddHsts(opts => opts.MaxAge = TimeSpan.From
 if (!string.IsNullOrEmpty(ApplicationSettings.RaygunSettings.ApiKey))
 {
     // Add error logging
-    builder.Services.AddSingleton(s =>
-    {
-        var client = new RaygunClient(s.GetService<RaygunSettings>()!, s.GetService<IRaygunUserProvider>()!);
-        client.SendingMessage += (_, eventArgs) =>
+    builder.Services
+        .AddSingleton(s =>
         {
-            eventArgs.Message.Details.Tags.Add(builder.Environment.EnvironmentName);
-        };
-        return client;
-    });
-    builder.Services.AddRaygun(builder.Configuration, opts =>
-    {
-        opts.ApiKey = ApplicationSettings.RaygunSettings.ApiKey;
-        opts.ExcludeErrorsFromLocal = false;
-        opts.IgnoreFormFieldNames = ["*Password"];
-    });
-    builder.Services.AddRaygunUserProvider();
-    builder.Services.AddHttpContextAccessor(); // needed by RaygunScriptPartial
+            var client = new RaygunClient(s.GetService<RaygunSettings>()!, s.GetService<IRaygunUserProvider>()!);
+            client.SendingMessage += (_, eventArgs) =>
+            {
+                eventArgs.Message.Details.Tags.Add(builder.Environment.EnvironmentName);
+            };
+            return client;
+        })
+        .AddRaygun(builder.Configuration, opts =>
+        {
+            opts.ApiKey = ApplicationSettings.RaygunSettings.ApiKey;
+            opts.ExcludeErrorsFromLocal = false;
+            opts.IgnoreFormFieldNames = ["*Password"];
+        })
+        .AddRaygunUserProvider()
+        .AddHttpContextAccessor(); // needed by RaygunScriptPartial
 }
 
 // Configure the UI.
@@ -94,13 +99,15 @@ else app.UseExceptionHandler("/Error"); // Production or Staging
 
 // Configure the HTTP request pipeline.
 if (!string.IsNullOrEmpty(ApplicationSettings.RaygunSettings.ApiKey)) app.UseRaygun();
-app.UseStatusCodePages();
-app.UseHttpsRedirection();
-app.UseWebOptimizer();
-app.UseStaticFiles();
-app.UseRouting();
-app.UseAuthentication();
-app.UseAuthorization();
+app
+    .UseStatusCodePages()
+    .UseHttpsRedirection()
+    .UseWebOptimizer()
+    .UseStaticFiles()
+    .UseRouting()
+    .UseAuthentication()
+    .UseAuthorization();
 app.MapRazorPages();
+app.MapHub<CheckHub>("/checkHub");
 
 await app.RunAsync();

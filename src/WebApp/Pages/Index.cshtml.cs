@@ -20,13 +20,9 @@ public class IndexModel : PageModel
         if (User.Identity is not { IsAuthenticated: true })
             return Challenge();
 
-        if (!ApplicationSettings.CheckEmailOptions.Enabled)
+        if (!ApplicationSettings.CheckEmailOptions.Enabled || string.IsNullOrEmpty(User.Identity.Name))
         {
             EmailCheckMessage = new ResultMessage(Context.Info, "Email checks are disabled.");
-        }
-        else if (string.IsNullOrEmpty(User.Identity.Name))
-        {
-            EmailCheckMessage = new ResultMessage(Context.Warning, "No recipient email available.");
         }
 
         if (!ApplicationSettings.CheckDatabaseOptions.Enabled)
@@ -34,13 +30,9 @@ public class IndexModel : PageModel
             DatabaseCheckMessage = new ResultMessage(Context.Info, "Database checks are disabled.");
         }
 
-        if (!ApplicationSettings.CheckDatabaseEmailOptions.Enabled)
+        if (!ApplicationSettings.CheckDatabaseEmailOptions.Enabled || string.IsNullOrEmpty(User.Identity.Name))
         {
             DatabaseEmailCheckMessage = new ResultMessage(Context.Info, "Database email checks are disabled.");
-        }
-        else if (string.IsNullOrEmpty(User.Identity.Name))
-        {
-            DatabaseEmailCheckMessage = new ResultMessage(Context.Warning, "No recipient email available.");
         }
 
         if (!ApplicationSettings.CheckExternalServiceOptions.Enabled)

@@ -66,5 +66,5 @@ public static class CheckDotnetVersion
 
 public class CheckDotnetVersionOptions
 {
-    public bool Enabled { get;  init; }
+    public bool Enabled { get; init; }
 }

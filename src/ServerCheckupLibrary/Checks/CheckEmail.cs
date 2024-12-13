@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.SignalR;
+using ServerCheckupLibrary.Hubs;
 using System.Net.Mail;
 using System.Text;
 
@@ -5,8 +7,11 @@ namespace ServerCheckupLibrary.Checks;
 
 public static class CheckEmail
 {
-    public static async Task<CheckResult> ExecuteAsync(CheckEmailOptions options)
+    private static IHubContext<CheckHub>? _hubContext;
+
+    public static async Task<CheckResult> ExecuteAsync(CheckEmailOptions options, IHubContext<CheckHub>? hubContext)
     {
+        _hubContext = hubContext;
         var result = new CheckResult();
 
         if (!options.Enabled)
@@ -15,7 +20,7 @@ public static class CheckEmail
             return result;
         }
 
-        if (string.IsNullOrEmpty(options.SenderEmail)|| string.IsNullOrEmpty(options.Recipient ))
+        if (string.IsNullOrEmpty(options.SenderEmail) || string.IsNullOrEmpty(options.Recipient))
         {
             result.AddMessage(Context.Warning, "Email configuration is incomplete.");
             return result;
@@ -47,27 +52,36 @@ public static class CheckEmail
         CheckResult result, bool enableSsl)
     {
         var sslText = enableSsl ? " using SSL" : "";
+        ResultMessage message;
 
         try
         {
             await SendTestEmail(sender, recipient, options, enableSsl);
 
-            result.AddMessage(Context.Success,
+            message = new ResultMessage(Context.Success,
                 $"Successfully sent email to \"{recipient}\"{sslText}.",
                 "(Check for receipt).");
         }
         catch (SmtpException ex)
         {
-            result.AddMessage(Context.Error,
+            message = new ResultMessage(Context.Error,
                 $"Unable to send email to \"{recipient}\"{sslText}.",
                 $"{ex.GetType()}; Status code: {ex.StatusCode.ToString()}");
         }
         catch (Exception ex)
         {
-            result.AddMessage(Context.Error,
+            message = new ResultMessage(Context.Error,
                 $"Unable to send email to \"{recipient}\"{sslText}.",
                 ex.GetType().ToString());
         }
+
+        if (_hubContext != null)
+        {
+            await _hubContext.Clients.All.SendAsync(CheckHub.ReceiveCheckResult,
+                "email-check", message.Text, message.Details, message.MessageContext.ToString());
+        }
+
+        result.AddMessage(message);
     }
 
     private static async Task SendTestEmail(MailAddress sender, MailAddress recipient, CheckEmailOptions options,
@@ -91,12 +105,12 @@ public static class CheckEmail
 
 public class CheckEmailOptions
 {
-    public bool Enabled { get;  init; }
-    public string SenderEmail { get;  init; } =string.Empty;
-    public string Recipient { get; set; } =string.Empty;
+    public bool Enabled { get; init; }
+    public string SenderEmail { get; init; } = string.Empty;
+    public string Recipient { get; set; } = string.Empty;
     public string ServerName { get; set; } = string.Empty;
-    public string SmtpHost { get;  init; } =string.Empty;
-    public int SmtpPort { get;  init; }
-    public bool CheckSslEmail { get;  set; }
-    public int SmtpSslPort { get;  init; }
+    public string SmtpHost { get; init; } = string.Empty;
+    public int SmtpPort { get; init; }
+    public bool CheckSslEmail { get; set; }
+    public int SmtpSslPort { get; init; }
 }
