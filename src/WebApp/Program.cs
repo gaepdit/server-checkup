@@ -6,6 +6,7 @@ using Microsoft.Identity.Web.UI;
 using Mindscape.Raygun4Net;
 using Mindscape.Raygun4Net.AspNetCore;
 using ServerCheckupLibrary.Checks;
+using ServerCheckupLibrary.Hubs;
 using System.Runtime.InteropServices;
 using WebApp.Platform;
 
@@ -54,6 +55,9 @@ else
 }
 
 builder.Services.AddAuthorization();
+
+// Add SignalR
+builder.Services.AddSignalR();
 
 // Configure HSTS (max age: two years).
 if (!isDevelopment) builder.Services.AddHsts(opts => opts.MaxAge = TimeSpan.FromDays(730));
@@ -104,5 +108,6 @@ app
     .UseAuthentication()
     .UseAuthorization();
 app.MapRazorPages();
+app.MapHub<CheckHub>("/checkHub");
 
 await app.RunAsync();
