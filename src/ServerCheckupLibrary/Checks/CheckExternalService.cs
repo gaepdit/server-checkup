@@ -1,11 +1,17 @@
+using Microsoft.AspNetCore.SignalR;
+using ServerCheckupLibrary.Hubs;
 using System.Net.Sockets;
 
 namespace ServerCheckupLibrary.Checks;
 
 public static class CheckExternalService
 {
-    public static async Task<CheckResult> ExecuteAsync(CheckExternalServiceOptions options)
+    private static IHubContext<CheckHub>? _hubContext;
+
+    public static async Task<CheckResult> ExecuteAsync(CheckExternalServiceOptions options,
+        IHubContext<CheckHub>? hubContext)
     {
+        _hubContext = hubContext;
         var result = new CheckResult();
 
         if (!options.Enabled)
@@ -21,29 +27,42 @@ public static class CheckExternalService
         }
 
         foreach (var service in options.ExternalServices)
-        {
-            try
-            {
-                if (await CheckServiceConnection(service))
-                {
-                    result.AddMessage(Context.Success,
-                        $"Successfully connected to \"{service}\".");
-                }
-                else
-                {
-                    result.AddMessage(Context.Warning,
-                        $"Remote host \"{service}\" was reached, but connection was unsuccessful.");
-                }
-            }
-            catch (Exception ex)
-            {
-                result.AddMessage(Context.Error,
-                    $"Unable to connect to \"{service}\".",
-                    ex.GetType().ToString());
-            }
-        }
+            await RecordExternalServiceCheck(service, result);
 
         return result;
+    }
+
+    private static async Task RecordExternalServiceCheck(string service, CheckResult result)
+    {
+        ResultMessage message;
+
+        try
+        {
+            if (await CheckServiceConnection(service))
+            {
+                message = new ResultMessage(Context.Success,
+                    $"Successfully connected to \"{service}\".");
+            }
+            else
+            {
+                message = new ResultMessage(Context.Warning,
+                    $"Remote host \"{service}\" was reached, but connection was unsuccessful.");
+            }
+        }
+        catch (Exception ex)
+        {
+            message = new ResultMessage(Context.Error,
+                $"Unable to connect to \"{service}\".",
+                ex.GetType().ToString());
+        }
+
+        if (_hubContext != null)
+        {
+            await _hubContext.Clients.All.SendAsync(CheckHub.ReceiveCheckResult,
+                "service-check", message.Text, message.Details, message.MessageContext.ToString());
+        }
+
+        result.AddMessage(message);
     }
 
     private static async Task<bool> CheckServiceConnection(string service)
@@ -57,6 +76,6 @@ public static class CheckExternalService
 
 public class CheckExternalServiceOptions
 {
-    public bool Enabled { get;  init; }
-    public string[]? ExternalServices { get;  init; }
+    public bool Enabled { get; init; }
+    public string[]? ExternalServices { get; init; }
 }

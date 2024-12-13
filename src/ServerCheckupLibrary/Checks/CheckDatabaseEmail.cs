@@ -1,13 +1,19 @@
-﻿using System.Data;
+﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.Data.SqlClient;
+using ServerCheckupLibrary.Hubs;
+using System.Data;
 using System.Net.Mail;
 
 namespace ServerCheckupLibrary.Checks;
 
 public static class CheckDatabaseEmail
 {
-    public static async Task<CheckResult> ExecuteAsync(CheckDatabaseEmailOptions options)
+    private static IHubContext<CheckHub>? _hubContext;
+
+    public static async Task<CheckResult> ExecuteAsync(CheckDatabaseEmailOptions options,
+        IHubContext<CheckHub>? hubContext)
     {
+        _hubContext = hubContext;
         var result = new CheckResult();
 
         if (!options.Enabled)
@@ -39,11 +45,13 @@ public static class CheckDatabaseEmail
 
     private static async Task RecordDatabaseEmailCheck(DatabaseConnection db, MailAddress recipient, CheckResult result)
     {
+        ResultMessage message;
+
         try
         {
             await SendEmailFromDatabase(db, recipient);
 
-            result.AddMessage(Context.Success,
+            message = new ResultMessage(Context.Success,
                 $"""
                  Successfully sent email from "{db.DataSource}" as user "{db.UserId}" using the
                  "{db.DbEmailProfileName}" profile.
@@ -52,13 +60,21 @@ public static class CheckDatabaseEmail
         }
         catch (Exception ex)
         {
-            result.AddMessage(Context.Error,
+            message = new ResultMessage(Context.Error,
                 $"""
                  Unable to send email from "{db.DataSource}" as user "{db.UserId}" using the
                  "{db.DbEmailProfileName}" profile.
                  """,
                 ex.GetType().ToString());
         }
+
+        if (_hubContext != null)
+        {
+            await _hubContext.Clients.All.SendAsync(CheckHub.ReceiveCheckResult,
+                "database-email-check", message.Text, message.Details, message.MessageContext.ToString());
+        }
+
+        result.AddMessage(message);
     }
 
     private static async Task SendEmailFromDatabase(DatabaseConnection db, MailAddress recipient)

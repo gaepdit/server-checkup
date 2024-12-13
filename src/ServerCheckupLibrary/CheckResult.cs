@@ -16,6 +16,12 @@ public class CheckResult : ICheckResult
         Messages.Add(new ResultMessage(messageContext, text, details));
         ResultContext = (Context)Math.Max((int)ResultContext, (int)messageContext);
     }
+
+    public void AddMessage(ResultMessage message)
+    {
+        Messages.Add(message);
+        ResultContext = (Context)Math.Max((int)ResultContext, (int)message.MessageContext);
+    }
 }
 
 public class InfoResult : ICheckResult

@@ -1,12 +1,17 @@
-﻿using Oracle.ManagedDataAccess.Client;
+﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.Data.SqlClient;
+using Oracle.ManagedDataAccess.Client;
+using ServerCheckupLibrary.Hubs;
 
 namespace ServerCheckupLibrary.Checks;
 
 public static class CheckDatabase
 {
-    public static async Task<CheckResult> ExecuteAsync(CheckDatabaseOptions options)
+    private static IHubContext<CheckHub>? _hubContext;
+
+    public static async Task<CheckResult> ExecuteAsync(CheckDatabaseOptions options, IHubContext<CheckHub>? hubContext)
     {
+        _hubContext = hubContext;
         var result = new CheckResult();
 
         if (!options.Enabled)
@@ -29,12 +34,14 @@ public static class CheckDatabase
 
     private static async Task RecordDatabaseConnectionCheck(DatabaseConnection db, CheckResult result)
     {
+        ResultMessage message;
+
         try
         {
             var response = await CheckDatabaseConnection(db);
             if (string.IsNullOrEmpty(response))
             {
-                result.AddMessage(Context.Warning,
+                message = new ResultMessage(Context.Warning,
                     db.TrustServerCertificate
                         ? $"Successfully connected to \"{db.DataSource}\" as user \"{db.UserId}\". (⚠️ May have used a self-signed certificate.)"
                         : $"Successfully made a secure connection to \"{db.DataSource}\" as user \"{db.UserId}\".",
@@ -44,7 +51,7 @@ public static class CheckDatabase
             }
             else
             {
-                result.AddMessage(Context.Success,
+                message = new ResultMessage(Context.Success,
                     db.TrustServerCertificate
                         ? $"Successfully connected to \"{db.DataSource}\" as user \"{db.UserId}\". (⚠️ May have used a self-signed certificate.)"
                         : $"Successfully made a secure connection to \"{db.DataSource}\" as user \"{db.UserId}\".",
@@ -53,12 +60,20 @@ public static class CheckDatabase
         }
         catch (Exception ex)
         {
-            result.AddMessage(Context.Error,
+            message = new ResultMessage(Context.Error,
                 db.TrustServerCertificate
                     ? $"Unable to connect to \"{db.DataSource}\" as user \"{db.UserId}\". [Self-signed certificate allowed.]"
                     : $"Unable to securely connect to \"{db.DataSource}\" as user \"{db.UserId}\".",
                 ex.GetType().ToString());
         }
+
+        if (_hubContext != null)
+        {
+            await _hubContext.Clients.All.SendAsync(CheckHub.ReceiveCheckResult,
+                "database-check", message.Text, message.Details, message.MessageContext.ToString());
+        }
+
+        result.AddMessage(message);
     }
 
     private static async Task<string?> CheckDatabaseConnection(DatabaseConnection db)
