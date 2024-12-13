@@ -26,7 +26,7 @@
     <ul class="list-group">
         @foreach (var message in Model.Messages)
         {
-            @Html.DisplayFor(m => message)
+            @Html.DisplayFor(_ => message)
         }
     </ul>
 }

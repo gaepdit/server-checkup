@@ -9,7 +9,7 @@ public interface ICheckResult
 public class CheckResult : ICheckResult
 {
     public Context ResultContext { get; private set; } = Context.Success;
-    public List<ResultMessage> Messages { get; } = new();
+    public List<ResultMessage> Messages { get; } = [];
 
     public void AddMessage(Context messageContext, string text, string? details = null)
     {

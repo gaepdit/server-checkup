@@ -1,10 +1,10 @@
-﻿"use strict";
+"use strict";
 document.addEventListener('DOMContentLoaded', function () {
-    prepCheck('#email-check', baseUrl + '/Check?handler=Email');
-    prepCheck('#database-check', baseUrl + '/Check?handler=Database');
-    prepCheck('#database-email-check', baseUrl + '/Check?handler=DatabaseEmail');
-    prepCheck('#service-check', baseUrl + '/Check?handler=ExternalService');
-    prepCheck('#dotnet-check', baseUrl + '/Check?handler=DotnetVersion');
+    prepCheck('#email-check', `${baseUrl}/Check?handler=Email`);
+    prepCheck('#database-check', `${baseUrl}/Check?handler=Database`);
+    prepCheck('#database-email-check', `${baseUrl}/Check?handler=DatabaseEmail`);
+    prepCheck('#service-check', `${baseUrl}/Check?handler=ExternalService`);
+    prepCheck('#dotnet-check', `${baseUrl}/Check?handler=DotnetVersion`);
 
     document.querySelector('#check-all').addEventListener('click', function () {
         document.querySelectorAll('.check-btn').forEach(function (btn) {
