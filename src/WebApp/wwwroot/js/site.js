@@ -2,7 +2,7 @@
 let connection;
 
 document.addEventListener('DOMContentLoaded', function () {
-    connection = new signalR.HubConnectionBuilder().withUrl("/checkHub").build();
+    connection = new signalR.HubConnectionBuilder().withUrl(`${baseUrl}/checkHub`).build();
     connection.on("ReceiveCheckResult", (checkId, text, details, context) =>
         handleCheckResult(checkId, text, details, context));
     connection.start();
