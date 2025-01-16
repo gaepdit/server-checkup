@@ -122,9 +122,13 @@
 <div class="mt-4">
     <small class="text-muted">
         <a href="https://github.com/gaepdit/server-checkup" target="_blank" rel="noopener">Server Checkup</a>
-        @if (Model.InformationalVersion is not null)
+        @if (Model.Version is not null)
         {
-            @: | Version @Model.InformationalVersion
+            @: | Version @Model.Version
+        }
+        @if (Model.Build is not null)
+        {
+            @: <em>(@Model.Build)</em>
         }
     </small>
 </div>
