@@ -1,12 +1,25 @@
 <Project>
-	<PropertyGroup>
-		<BaseProjectArtifactPath>$(MSBuildThisFileDirectory).artifacts\$(MSBuildProjectName)</BaseProjectArtifactPath>
-		<BaseOutputPath>$(BaseProjectArtifactPath)\bin\</BaseOutputPath>
-		<BaseIntermediateOutputPath>$(BaseProjectArtifactPath)\obj\</BaseIntermediateOutputPath>
-	</PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
 
-	<PropertyGroup>
-		<!-- https://aka.ms/vs-build-acceleration -->
-		<AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
-	</PropertyGroup>
+    <PropertyGroup>
+        <BaseProjectArtifactPath>$(MSBuildThisFileDirectory).artifacts\$(MSBuildProjectName)</BaseProjectArtifactPath>
+        <BaseOutputPath>$(BaseProjectArtifactPath)\bin\</BaseOutputPath>
+        <BaseIntermediateOutputPath>$(BaseProjectArtifactPath)\obj\</BaseIntermediateOutputPath>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <!-- https://aka.ms/vs-build-acceleration -->
+        <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="SonarAnalyzer.CSharp">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
 </Project>

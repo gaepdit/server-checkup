@@ -10,9 +10,6 @@
     <PackageVersion Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
     <PackageVersion Include="Mindscape.Raygun4Net.AspNetCore" Version="11.2.1" />
     <PackageVersion Include="Oracle.ManagedDataAccess.Core" Version="23.7.0" />
-    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.5.0.109200">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageVersion>
+    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.5.0.109200" />
   </ItemGroup>
 </Project>
