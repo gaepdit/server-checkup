@@ -1,16 +1,15 @@
 {
   "version": "1.0",
-  "defaultProvider": "cdnjs",
+  "defaultProvider": "jsdelivr",
   "libraries": [
     {
-      "library": "bootstrap@5.2.2",
+      "library": "bootstrap@5.3.5",
       "destination": "wwwroot/lib/bootstrap/",
       "files": [
-        "css/bootstrap.min.css"
+        "dist/css/bootstrap.min.css"
       ]
     },
     {
-      "provider": "unpkg",
       "library": "@microsoft/signalr@latest",
       "destination": "wwwroot/lib/signalr",
       "files": [
