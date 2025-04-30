@@ -64,7 +64,8 @@ public static class CheckDotnetVersion
     }
 }
 
-public class CheckDotnetVersionOptions
+[UsedImplicitly(ImplicitUseTargetFlags.Members)]
+public record CheckDotnetVersionOptions
 {
     public bool Enabled { get; init; }
 }

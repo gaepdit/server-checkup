@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using Oracle.ManagedDataAccess.Client;
-using ServerCheckupLibrary.Hubs;
 
 namespace ServerCheckupLibrary.Checks;
 
@@ -117,13 +115,15 @@ public static class CheckDatabase
     }
 }
 
-public class CheckDatabaseOptions
+[UsedImplicitly(ImplicitUseTargetFlags.Members)]
+public record CheckDatabaseOptions
 {
     public bool Enabled { get; init; }
     public DatabaseConnection[]? DatabaseConnections { get; init; }
 }
 
-public class DatabaseConnection
+[UsedImplicitly(ImplicitUseTargetFlags.Members)]
+public record DatabaseConnection
 {
     public string Vendor { get; init; } = string.Empty;
     public string DataSource { get; init; } = string.Empty;

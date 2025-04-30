@@ -6,7 +6,7 @@ public interface ICheckResult
     List<ResultMessage> Messages { get; }
 }
 
-public class CheckResult : ICheckResult
+public record CheckResult : ICheckResult
 {
     public Context ResultContext { get; private set; } = Context.Success;
     public List<ResultMessage> Messages { get; } = [];
@@ -24,7 +24,7 @@ public class CheckResult : ICheckResult
     }
 }
 
-public class InfoResult : ICheckResult
+public record InfoResult : ICheckResult
 {
     public Context ResultContext => Context.Info;
     public List<ResultMessage> Messages { get; } = new();

@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.SignalR;
-using ServerCheckupLibrary.Hubs;
 using System.Net.Mail;
 using System.Text;
 
@@ -103,7 +101,8 @@ public static class CheckEmail
     }
 }
 
-public class CheckEmailOptions
+[UsedImplicitly(ImplicitUseTargetFlags.Members)]
+public record CheckEmailOptions
 {
     public bool Enabled { get; init; }
     public string SenderEmail { get; init; } = string.Empty;
