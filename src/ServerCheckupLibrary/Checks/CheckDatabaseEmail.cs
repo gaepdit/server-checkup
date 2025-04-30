@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using Microsoft.Data.SqlClient;
-using ServerCheckupLibrary.Hubs;
+﻿using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Net.Mail;
 
@@ -112,7 +110,8 @@ public static class CheckDatabaseEmail
     }
 }
 
-public class CheckDatabaseEmailOptions
+[UsedImplicitly(ImplicitUseTargetFlags.Members)]
+public record CheckDatabaseEmailOptions
 {
     public bool Enabled { get; init; }
     public DatabaseConnection[]? DatabaseConnections { get; init; }

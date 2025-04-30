@@ -9,7 +9,7 @@ using WebApp.Platform;
 namespace WebApp.Pages;
 
 [Authorize]
-public class CheckModel(IHubContext<CheckHub>? hubContext) : PageModel
+public class CheckModel(IHubContext<CheckHub>? hubContext, IHttpClientFactory httpClientFactory) : PageModel
 {
     public ICheckResult Result { get; private set; } = null!;
 
@@ -30,7 +30,8 @@ public class CheckModel(IHubContext<CheckHub>? hubContext) : PageModel
     }
 
     public async Task OnGetExternalServiceAsync() =>
-        Result = await CheckExternalService.ExecuteAsync(ApplicationSettings.CheckExternalServiceOptions, hubContext);
+        Result = await CheckExternalService.ExecuteAsync(ApplicationSettings.CheckExternalServiceOptions, hubContext,
+            httpClientFactory);
 
     public void OnGetDotnetVersion() =>
         Result = CheckDotnetVersion.Execute(ApplicationSettings.CheckDotnetVersionOptions);

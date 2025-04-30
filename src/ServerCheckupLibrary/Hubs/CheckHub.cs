@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.SignalR;
-
 namespace ServerCheckupLibrary.Hubs;
 
 public class CheckHub : Hub

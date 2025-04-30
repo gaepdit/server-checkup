@@ -90,6 +90,9 @@ if (!string.IsNullOrEmpty(ApplicationSettings.RaygunSettings.ApiKey))
 builder.Services.AddRazorPages().AddMicrosoftIdentityUI();
 builder.Services.AddWebOptimizer(minifyJavaScript: !isDevelopment);
 
+// Add HttpClient (used by CheckExternalService)
+builder.Services.AddHttpClient();
+
 // Build the application.
 var app = builder.Build();
 
