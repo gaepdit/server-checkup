@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.SignalR;
-using ServerCheckupLibrary.Hubs;
 using System.Net.Sockets;
 
 namespace ServerCheckupLibrary.Checks;
@@ -7,11 +5,14 @@ namespace ServerCheckupLibrary.Checks;
 public static class CheckExternalService
 {
     private static IHubContext<CheckHub>? _hubContext;
+    private static IHttpClientFactory _httpClientFactory = null!;
 
     public static async Task<CheckResult> ExecuteAsync(CheckExternalServiceOptions options,
-        IHubContext<CheckHub>? hubContext)
+        IHubContext<CheckHub>? hubContext, IHttpClientFactory httpClientFactory)
     {
         _hubContext = hubContext;
+        _httpClientFactory = httpClientFactory;
+
         var result = new CheckResult();
 
         if (!options.Enabled)
@@ -32,7 +33,7 @@ public static class CheckExternalService
         return result;
     }
 
-    private static async Task RecordExternalServiceCheck(string service, CheckResult result)
+    private static async Task RecordExternalServiceCheck(ExternalService service, CheckResult result)
     {
         ResultMessage message;
 
@@ -41,18 +42,24 @@ public static class CheckExternalService
             if (await CheckServiceConnection(service))
             {
                 message = new ResultMessage(Context.Success,
-                    $"Successfully connected to \"{service}\".");
+                    $"Successfully connected to \"{service.ServiceUri}\".");
             }
             else
             {
-                message = new ResultMessage(Context.Warning,
-                    $"Remote host \"{service}\" was reached, but connection was unsuccessful.");
+                message = service.Type switch
+                {
+                    "http" => new ResultMessage(Context.Warning,
+                        $"Connected to remote host \"{service.ServiceUri}\" but it did not return a success status code."),
+                    "tcp" => new ResultMessage(Context.Warning,
+                        $"Remote host \"{service.ServiceUri}\" was reached, but connection was unsuccessful."),
+                    _ => throw new ArgumentException("Invalid service type.", nameof(service)),
+                };
             }
         }
         catch (Exception ex)
         {
             message = new ResultMessage(Context.Error,
-                $"Unable to connect to \"{service}\".",
+                $"Unable to connect to \"{service.ServiceUri}\".",
                 ex.GetType().ToString());
         }
 
@@ -65,17 +72,40 @@ public static class CheckExternalService
         result.AddMessage(message);
     }
 
-    private static async Task<bool> CheckServiceConnection(string service)
+    private static async Task<bool> CheckServiceConnection(ExternalService service) =>
+        service.Type switch
+        {
+            "http" => await CheckHttpServiceConnection(service.ServiceUri),
+            "tcp" => await CheckTcpServiceConnection(service.ServiceUri),
+            _ => throw new ArgumentException("Invalid service type.", nameof(service)),
+        };
+
+    private static async Task<bool> CheckHttpServiceConnection(string serviceUri)
+    {
+        using var client = _httpClientFactory.CreateClient(nameof(CheckHttpServiceConnection));
+        using var response = await client.GetAsync(serviceUri);
+        return response.IsSuccessStatusCode;
+    }
+
+    private static async Task<bool> CheckTcpServiceConnection(string serviceUri)
     {
         using var tcpClient = new TcpClient();
-        var uri = new Uri(service);
+        var uri = new Uri(serviceUri);
         await tcpClient.ConnectAsync(uri.Host, uri.Port);
         return tcpClient.Connected;
     }
 }
 
-public class CheckExternalServiceOptions
+[UsedImplicitly(ImplicitUseTargetFlags.Members)]
+public record CheckExternalServiceOptions
 {
     public bool Enabled { get; init; }
-    public string[]? ExternalServices { get; init; }
+    public ExternalService[]? ExternalServices { get; init; }
+}
+
+[UsedImplicitly(ImplicitUseTargetFlags.Members)]
+public record ExternalService
+{
+    public required string ServiceUri { get; init; }
+    public required string Type { get; init; } // Valid types are "http" and "tcp"
 }

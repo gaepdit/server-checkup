@@ -1,7 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
+        <PackageReference Include="JetBrains.Annotations" />
         <PackageReference Include="Microsoft.AspNetCore.SignalR.Core"/>
         <PackageReference Include="Microsoft.Data.SqlClient" />
+        <PackageReference Include="Microsoft.Extensions.Http" />
         <PackageReference Include="Oracle.ManagedDataAccess.Core" />
     </ItemGroup>
 </Project>
