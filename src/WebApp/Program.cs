@@ -1,24 +1,18 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using Mindscape.Raygun4Net;
 using Mindscape.Raygun4Net.AspNetCore;
 using ServerCheckupLibrary.Checks;
 using ServerCheckupLibrary.Hubs;
-using System.Runtime.InteropServices;
 using WebApp.Platform;
 
 var builder = WebApplication.CreateBuilder(args);
 var isDevelopment = builder.Environment.IsDevelopment();
 
 // Persist data protection keys
-var keysFolder = Path.Combine(builder.Configuration["PersistedFilesBasePath"] ?? "./", "DataProtectionKeys");
-var dataProtectionBuilder =
-    builder.Services.AddDataProtection().PersistKeysToFileSystem(Directory.CreateDirectory(keysFolder));
-if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-    dataProtectionBuilder.ProtectKeysWithDpapi(protectToLocalMachine: true);
+builder.Services.AddDataProtection();
 
 // Bind application settings.
 builder.Configuration.GetSection(nameof(CheckEmailOptions)).Bind(AppSettings.CheckEmailOptions);
