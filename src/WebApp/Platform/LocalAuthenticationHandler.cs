@@ -7,14 +7,16 @@ using System.Text.Encodings.Web;
 namespace WebApp.Platform;
 
 // Provides an authenticated user when running locally
-internal class LocalAuthenticationHandler(IOptionsMonitor<AuthenticationSchemeOptions> options, ILoggerFactory logger,
+internal class LocalAuthenticationHandler(
+    IOptionsMonitor<AuthenticationSchemeOptions> options,
+    ILoggerFactory logger,
     UrlEncoder encoder) : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
 {
     public const string BasicAuthenticationScheme = "BasicAuthentication";
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        var userEmail = ApplicationSettings.DevOptions.AuthenticatedUser;
+        var userEmail = AppSettings.DevOptions.AuthenticatedUser;
         if (string.IsNullOrEmpty(userEmail))
             return Task.FromResult(AuthenticateResult.Fail("Invalid"));
         var claims = new[] { new Claim(ClaimTypes.Name, userEmail) };
@@ -27,6 +29,6 @@ internal class LocalAuthenticationHandler(IOptionsMonitor<AuthenticationSchemeOp
     {
         await base.HandleChallengeAsync(properties);
         await Response.BodyWriter.WriteAsync(Encoding.UTF8.GetBytes("Status Code: 403; Forbidden \r\n" +
-            "To access protected pages, set 'DevOptions.AuthenticatedUser' to an email address in 'appsettings.Development.json' file."));
+                                                                    "To access protected pages, set 'DevOptions.AuthenticatedUser' to an email address in 'appsettings.Development.json' file."));
     }
 }

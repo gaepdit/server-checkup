@@ -2,9 +2,9 @@
 @using WebApp.Platform
 @model IndexModel
 @{
-    var serverName = string.IsNullOrWhiteSpace(ApplicationSettings.ServerName)
+    var serverName = string.IsNullOrWhiteSpace(AppSettings.ServerName)
         ? Environment.MachineName
-        : $"{ApplicationSettings.ServerName} ({Environment.MachineName})";
+        : $"{AppSettings.ServerName} ({Environment.MachineName})";
     ViewData["Title"] = $"Server Checkup: {serverName}";
 }
 

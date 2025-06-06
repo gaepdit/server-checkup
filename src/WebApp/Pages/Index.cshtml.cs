@@ -22,27 +22,27 @@ public class IndexModel : PageModel
         if (User.Identity is not { IsAuthenticated: true })
             return Challenge();
 
-        if (!ApplicationSettings.CheckEmailOptions.Enabled || string.IsNullOrEmpty(User.Identity.Name))
+        if (!AppSettings.CheckEmailOptions.Enabled || string.IsNullOrEmpty(User.Identity.Name))
         {
             EmailCheckMessage = new ResultMessage(Context.Info, "Email checks are disabled.");
         }
 
-        if (!ApplicationSettings.CheckDatabaseOptions.Enabled)
+        if (!AppSettings.CheckDatabaseOptions.Enabled)
         {
             DatabaseCheckMessage = new ResultMessage(Context.Info, "Database checks are disabled.");
         }
 
-        if (!ApplicationSettings.CheckDatabaseEmailOptions.Enabled || string.IsNullOrEmpty(User.Identity.Name))
+        if (!AppSettings.CheckDatabaseEmailOptions.Enabled || string.IsNullOrEmpty(User.Identity.Name))
         {
             DatabaseEmailCheckMessage = new ResultMessage(Context.Info, "Database email checks are disabled.");
         }
 
-        if (!ApplicationSettings.CheckExternalServiceOptions.Enabled)
+        if (!AppSettings.CheckExternalServiceOptions.Enabled)
         {
             ExternalServiceCheckMessage = new ResultMessage(Context.Info, "External service checks are disabled.");
         }
 
-        if (!ApplicationSettings.CheckDotnetVersionOptions.Enabled)
+        if (!AppSettings.CheckDotnetVersionOptions.Enabled)
         {
             DotnetVersionCheckMessage = new ResultMessage(Context.Info, ".NET version checks are disabled.");
         }
