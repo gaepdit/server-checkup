@@ -15,24 +15,23 @@ public class CheckModel(IHubContext<CheckHub>? hubContext, IHttpClientFactory ht
 
     public async Task OnGetEmailAsync()
     {
-        ApplicationSettings.CheckEmailOptions.Recipient = User.Identity?.Name ?? string.Empty;
-        ApplicationSettings.CheckEmailOptions.ServerName = ApplicationSettings.ServerName;
-        Result = await CheckEmail.ExecuteAsync(ApplicationSettings.CheckEmailOptions, hubContext);
+        AppSettings.CheckEmailOptions.Recipient = User.Identity?.Name ?? string.Empty;
+        AppSettings.CheckEmailOptions.ServerName = AppSettings.ServerName;
+        Result = await CheckEmail.ExecuteAsync(AppSettings.CheckEmailOptions, hubContext);
     }
 
     public async Task OnGetDatabaseAsync() =>
-        Result = await CheckDatabase.ExecuteAsync(ApplicationSettings.CheckDatabaseOptions, hubContext);
+        Result = await CheckDatabase.ExecuteAsync(AppSettings.CheckDatabaseOptions, hubContext);
 
     public async Task OnGetDatabaseEmailAsync()
     {
-        ApplicationSettings.CheckDatabaseEmailOptions.Recipient = User.Identity?.Name ?? string.Empty;
-        Result = await CheckDatabaseEmail.ExecuteAsync(ApplicationSettings.CheckDatabaseEmailOptions, hubContext);
+        AppSettings.CheckDatabaseEmailOptions.Recipient = User.Identity?.Name ?? string.Empty;
+        Result = await CheckDatabaseEmail.ExecuteAsync(AppSettings.CheckDatabaseEmailOptions, hubContext);
     }
 
-    public async Task OnGetExternalServiceAsync() =>
-        Result = await CheckExternalService.ExecuteAsync(ApplicationSettings.CheckExternalServiceOptions, hubContext,
-            httpClientFactory);
+    public async Task OnGetExternalServiceAsync() => Result =
+        await CheckExternalService.ExecuteAsync(AppSettings.CheckExternalServiceOptions, hubContext, httpClientFactory);
 
     public void OnGetDotnetVersion() =>
-        Result = CheckDotnetVersion.Execute(ApplicationSettings.CheckDotnetVersionOptions);
+        Result = CheckDotnetVersion.Execute(AppSettings.CheckDotnetVersionOptions);
 }

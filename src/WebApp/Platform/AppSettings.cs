@@ -1,8 +1,9 @@
-﻿using ServerCheckupLibrary.Checks;
+﻿using JetBrains.Annotations;
+using ServerCheckupLibrary.Checks;
 
 namespace WebApp.Platform;
 
-public static class ApplicationSettings
+public static class AppSettings
 {
     public static CheckEmailOptions CheckEmailOptions { get; } = new();
     public static CheckDatabaseOptions CheckDatabaseOptions { get; } = new();
@@ -15,12 +16,14 @@ public static class ApplicationSettings
     // Raygun client settings
     public static RaygunClientSettings RaygunSettings { get; } = new();
 
+    [UsedImplicitly(ImplicitUseTargetFlags.Members)]
     public class RaygunClientSettings
     {
         public string? ApiKey { get; init; }
     }
 }
 
+[UsedImplicitly(ImplicitUseTargetFlags.Members)]
 public class DevOptions
 {
     public bool UseLocalAuth { get; init; }

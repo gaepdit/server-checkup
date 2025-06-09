@@ -21,24 +21,17 @@ if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
     dataProtectionBuilder.ProtectKeysWithDpapi(protectToLocalMachine: true);
 
 // Bind application settings.
-builder.Configuration.GetSection(nameof(CheckEmailOptions))
-    .Bind(ApplicationSettings.CheckEmailOptions);
-builder.Configuration.GetSection(nameof(CheckDatabaseOptions))
-    .Bind(ApplicationSettings.CheckDatabaseOptions);
-builder.Configuration.GetSection(nameof(CheckDatabaseEmailOptions))
-    .Bind(ApplicationSettings.CheckDatabaseEmailOptions);
-builder.Configuration.GetSection(nameof(CheckExternalServiceOptions))
-    .Bind(ApplicationSettings.CheckExternalServiceOptions);
-builder.Configuration.GetSection(nameof(CheckDotnetVersionOptions))
-    .Bind(ApplicationSettings.CheckDotnetVersionOptions);
-builder.Configuration.GetSection(nameof(DevOptions)).Bind(ApplicationSettings.DevOptions);
-ApplicationSettings.ServerName =
-    builder.Configuration.GetValue<string>(nameof(ApplicationSettings.ServerName)) ?? "Unknown";
-builder.Configuration.GetSection(nameof(ApplicationSettings.RaygunSettings))
-    .Bind(ApplicationSettings.RaygunSettings);
+builder.Configuration.GetSection(nameof(CheckEmailOptions)).Bind(AppSettings.CheckEmailOptions);
+builder.Configuration.GetSection(nameof(CheckDatabaseOptions)).Bind(AppSettings.CheckDatabaseOptions);
+builder.Configuration.GetSection(nameof(CheckDatabaseEmailOptions)).Bind(AppSettings.CheckDatabaseEmailOptions);
+builder.Configuration.GetSection(nameof(CheckExternalServiceOptions)).Bind(AppSettings.CheckExternalServiceOptions);
+builder.Configuration.GetSection(nameof(CheckDotnetVersionOptions)).Bind(AppSettings.CheckDotnetVersionOptions);
+builder.Configuration.GetSection(nameof(DevOptions)).Bind(AppSettings.DevOptions);
+AppSettings.ServerName = builder.Configuration.GetValue<string>(nameof(AppSettings.ServerName)) ?? "Unknown";
+builder.Configuration.GetSection(nameof(AppSettings.RaygunSettings)).Bind(AppSettings.RaygunSettings);
 
 // Configure authentication.
-if (ApplicationSettings.DevOptions.UseLocalAuth)
+if (AppSettings.DevOptions.UseLocalAuth)
 {
     // When running locally, use a built-in authenticated user.
     builder.Services
@@ -63,7 +56,7 @@ builder.Services.AddSignalR();
 if (!isDevelopment) builder.Services.AddHsts(opts => opts.MaxAge = TimeSpan.FromDays(730));
 
 // Configure application monitoring.
-if (!string.IsNullOrEmpty(ApplicationSettings.RaygunSettings.ApiKey))
+if (!string.IsNullOrEmpty(AppSettings.RaygunSettings.ApiKey))
 {
     // Add error logging
     builder.Services
@@ -71,14 +64,12 @@ if (!string.IsNullOrEmpty(ApplicationSettings.RaygunSettings.ApiKey))
         {
             var client = new RaygunClient(s.GetService<RaygunSettings>()!, s.GetService<IRaygunUserProvider>()!);
             client.SendingMessage += (_, eventArgs) =>
-            {
                 eventArgs.Message.Details.Tags.Add(builder.Environment.EnvironmentName);
-            };
             return client;
         })
         .AddRaygun(builder.Configuration, opts =>
         {
-            opts.ApiKey = ApplicationSettings.RaygunSettings.ApiKey;
+            opts.ApiKey = AppSettings.RaygunSettings.ApiKey;
             opts.ExcludeErrorsFromLocal = false;
             opts.IgnoreFormFieldNames = ["*Password"];
         })
@@ -101,7 +92,7 @@ if (isDevelopment) app.UseDeveloperExceptionPage(); // Development
 else app.UseExceptionHandler("/Error"); // Production or Staging
 
 // Configure the HTTP request pipeline.
-if (!string.IsNullOrEmpty(ApplicationSettings.RaygunSettings.ApiKey)) app.UseRaygun();
+if (!string.IsNullOrEmpty(AppSettings.RaygunSettings.ApiKey)) app.UseRaygun();
 app
     .UseStatusCodePages()
     .UseHttpsRedirection()
