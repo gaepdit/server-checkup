@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
     <PropertyGroup>
-        <InformationalVersion>2025.4.30</InformationalVersion>
+        <InformationalVersion>2025.10.29</InformationalVersion>
+        <AssemblyName>ServerCheckup</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>
