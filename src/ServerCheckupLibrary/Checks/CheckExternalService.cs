@@ -42,16 +42,16 @@ public static class CheckExternalService
             if (await CheckServiceConnection(service))
             {
                 message = new ResultMessage(Context.Success,
-                    $"Successfully connected to \"{service.ServiceUri}\".");
+                    $"Successfully connected to \"{service.ServiceUri}\" via {service.Type}.");
             }
             else
             {
                 message = service.Type switch
                 {
                     "http" => new ResultMessage(Context.Warning,
-                        $"Connected to remote host \"{service.ServiceUri}\" but it did not return a success status code."),
+                        $"Connected to remote host \"{service.ServiceUri}\" via {service.Type} but it did not return a success status code."),
                     "tcp" => new ResultMessage(Context.Warning,
-                        $"Remote host \"{service.ServiceUri}\" was reached, but connection was unsuccessful."),
+                        $"Remote host \"{service.ServiceUri}\" was reached via {service.Type}, but connection was unsuccessful."),
                     _ => throw new ArgumentException("Invalid service type.", nameof(service)),
                 };
             }
