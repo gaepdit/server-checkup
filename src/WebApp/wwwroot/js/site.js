@@ -68,31 +68,34 @@ function getContextClass(context) {
 function prepCheck(checkSectionId, endPoint) {
     const checkEl = document.querySelector(`#${checkSectionId}`);
     const buttonEl = checkEl.querySelector('button');
-    const resultsEl = checkEl.querySelector('.check-results');
 
-    buttonEl.addEventListener('click', function () {
-        resultsEl.innerHTML = '';
-        const messageListEl = document.createElement('ul');
-        messageListEl.className = 'list-group';
-        resultsEl.appendChild(messageListEl);
+    if (buttonEl) {
+        const resultsEl = checkEl.querySelector('.check-results');
 
-        setAsLoading(buttonEl);
-        fetch(endPoint)
-            .then(response => response.text())
-            .then(result => {
-                resetAsLoading(buttonEl);
-                resultsEl.innerHTML = result;
-            })
-            .catch(error => {
-                resetAsLoading(buttonEl);
-                handleCheckResult(checkSectionId, 'An error occurred', error, 'Error');
-                if (error instanceof Error) {
-                    rg4js('send', {error: error, tags: ['handled_promise_rejection']});
-                } else {
-                    console.error(error);
-                }
-            });
-    });
+        buttonEl.addEventListener('click', function () {
+            resultsEl.innerHTML = '';
+            const messageListEl = document.createElement('ul');
+            messageListEl.className = 'list-group';
+            resultsEl.appendChild(messageListEl);
+
+            setAsLoading(buttonEl);
+            fetch(endPoint)
+                .then(response => response.text())
+                .then(result => {
+                    resetAsLoading(buttonEl);
+                    resultsEl.innerHTML = result;
+                })
+                .catch(error => {
+                    resetAsLoading(buttonEl);
+                    handleCheckResult(checkSectionId, 'An error occurred', error, 'Error');
+                    if (error instanceof Error) {
+                        rg4js('send', {error: error, tags: ['handled_promise_rejection']});
+                    } else {
+                        console.error(error);
+                    }
+                });
+        });
+    }
 }
 
 function setAsLoading(btnEl) {
