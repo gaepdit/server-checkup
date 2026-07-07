@@ -10,7 +10,6 @@
     <PackageVersion Include="Microsoft.Data.SqlClient" Version="7.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.8" />
     <PackageVersion Include="Microsoft.Web.LibraryManager.Build" Version="3.0.71" />
-    <PackageVersion Include="Mindscape.Raygun4Net.AspNetCore" Version="11.2.5" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageVersion Include="Oracle.ManagedDataAccess.Core" Version="23.26.200" />
     <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.27.0.140913" />

@@ -8,7 +8,6 @@
         <PackageReference Include="LigerShark.WebOptimizer.Core"/>
         <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
         <PackageReference Include="Microsoft.Web.LibraryManager.Build"/>
-        <PackageReference Include="Mindscape.Raygun4Net.AspNetCore"/>
     </ItemGroup>
 
     <ItemGroup>
