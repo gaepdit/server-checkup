@@ -6,9 +6,13 @@ using Microsoft.IdentityModel.Tokens;
 using ServerCheckupLibrary.Checks;
 using ServerCheckupLibrary.Hubs;
 using WebApp.Platform;
+using ZLogger;
 
 var builder = WebApplication.CreateBuilder(args);
 var isDevelopment = builder.Environment.IsDevelopment();
+
+// Configure logging
+builder.Logging.ClearProviders().AddZLoggerConsole(options => options.UseJsonFormatter());
 
 // Persist data protection keys
 builder.Services.AddDataProtection();
