@@ -88,11 +88,7 @@ function prepCheck(checkSectionId, endPoint) {
                 .catch(error => {
                     resetAsLoading(buttonEl);
                     handleCheckResult(checkSectionId, 'An error occurred', error, 'Error');
-                    if (error instanceof Error) {
-                        rg4js('send', {error: error, tags: ['handled_promise_rejection']});
-                    } else {
-                        console.error(error);
-                    }
+                    console.error(error);
                 });
         });
     }
