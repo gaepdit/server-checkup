@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ServerCheckupLibrary;
-using System.Reflection;
 using WebApp.Platform;
 
 namespace WebApp.Pages;
@@ -13,9 +12,6 @@ public class IndexModel : PageModel
     public ResultMessage? DatabaseEmailCheckMessage { get; private set; }
     public ResultMessage? ExternalServiceCheckMessage { get; private set; }
     public ResultMessage? DotnetVersionCheckMessage { get; private set; }
-
-    public string? Version { get; private set; }
-    public string? Build { get; private set; }
 
     public IActionResult OnGet()
     {
@@ -46,14 +42,6 @@ public class IndexModel : PageModel
         {
             DotnetVersionCheckMessage = new ResultMessage(Context.Info, ".NET version checks are disabled.");
         }
-
-        // Get app version.
-        var entryAssembly = Assembly.GetEntryAssembly();
-        var segments = (entryAssembly?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
-            .InformationalVersion ?? entryAssembly?.GetName().Version?.ToString() ?? "").Split('+');
-
-        Version = segments[0];
-        if (segments.Length > 0) Build = segments[1][..Math.Min(7, segments[1].Length)];
 
         return Page();
     }
