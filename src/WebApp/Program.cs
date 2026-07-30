@@ -1,9 +1,3 @@
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Microsoft.IdentityModel.Tokens;
-using ServerCheckupLibrary.Checks;
 using ServerCheckupLibrary.Hubs;
 using WebApp.Platform;
 using ZLogger;
@@ -11,57 +5,17 @@ using ZLogger;
 var builder = WebApplication.CreateBuilder(args);
 var isDevelopment = builder.Environment.IsDevelopment();
 
-// Configure logging
+// Configure logging.
 builder.Logging.ClearProviders().AddZLoggerConsole(options => options.UseJsonFormatter());
 
-// Persist data protection keys
+// Persist data protection keys.
 builder.Services.AddDataProtection();
 
 // Bind application settings.
-builder.Configuration.GetSection(nameof(CheckEmailOptions)).Bind(AppSettings.CheckEmailOptions);
-builder.Configuration.GetSection(nameof(CheckDatabaseOptions)).Bind(AppSettings.CheckDatabaseOptions);
-builder.Configuration.GetSection(nameof(CheckDatabaseEmailOptions)).Bind(AppSettings.CheckDatabaseEmailOptions);
-builder.Configuration.GetSection(nameof(CheckExternalServiceOptions)).Bind(AppSettings.CheckExternalServiceOptions);
-builder.Configuration.GetSection(nameof(CheckDotnetVersionOptions)).Bind(AppSettings.CheckDotnetVersionOptions);
-builder.Configuration.GetSection(nameof(DevOptions)).Bind(AppSettings.DevOptions);
-AppSettings.ServerName = builder.Configuration.GetValue<string>(nameof(AppSettings.ServerName)) ?? "Unknown";
+builder.BindAppSettings();
 
-// Configure authentication.
-if (AppSettings.DevOptions.UseLocalAuth)
-{
-    // When running locally, use a built-in authenticated user.
-    builder.Services
-        .AddAuthentication(LocalAuthenticationHandler.BasicAuthenticationScheme)
-        .AddScheme<AuthenticationSchemeOptions, LocalAuthenticationHandler>(
-            LocalAuthenticationHandler.BasicAuthenticationScheme, null);
-}
-else
-{
-    // When running on the server, require an OIDC login provider (configured in the appsettings file).
-    builder.Services
-        .AddAuthentication(options =>
-        {
-            options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
-        })
-        .AddCookie()
-        .AddOpenIdConnect(configureOptions: options =>
-        {
-            var configSection = builder.Configuration.GetSection("OIDC");
-
-            options.Authority = configSection["Authority"];
-            options.ClientId = configSection["ClientId"];
-            options.ClientSecret = configSection["ClientSecret"];
-            options.CallbackPath = configSection["CallbackPath"];
-
-            options.Scope.Add("email");
-            options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            options.ResponseType = OpenIdConnectResponseType.Code;
-            options.MapInboundClaims = false;
-            options.TokenValidationParameters = new TokenValidationParameters { NameClaimType = "email" };
-        });
-}
-
+// Configure authentication and authorization.
+builder.ConfigureAuthentication();
 builder.Services.AddAuthorization();
 
 // Add SignalR

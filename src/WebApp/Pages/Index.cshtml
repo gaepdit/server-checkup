@@ -122,13 +122,9 @@
 <div class="mt-4">
     <small class="text-body-secondary">
         <a href="https://github.com/gaepdit/server-checkup" target="_blank" rel="noopener">Server Checkup</a>
-        @if (Model.Version is not null)
+        @if (!string.IsNullOrEmpty(AppSettings.Version))
         {
-            @: | Version @Model.Version
-        }
-        @if (Model.Build is not null)
-        {
-            @: <em>(@Model.Build)</em>
+            @:| Version: <em>@AppSettings.Version</em>
         }
     </small>
 </div>

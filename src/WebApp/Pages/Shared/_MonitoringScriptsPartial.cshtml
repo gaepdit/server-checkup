@@ -1,0 +1,39 @@
+﻿@using WebApp.Platform
+@{
+    // DataDog
+    var ddClientToken = AppSettings.DataDogSettings.ClientToken;
+    var ddApplicationId = AppSettings.DataDogSettings.ApplicationId;
+    const string service = "checkup";
+
+    if (!string.IsNullOrEmpty(ddClientToken) && !string.IsNullOrEmpty(ddApplicationId))
+    {
+        <script asp-add-nonce>
+            @* @formatter:off *@
+            (function(h,o,u,n,d) {
+                h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}}
+                d=o.createElement(u);d.async=1;d.src=n;d.crossOrigin=''
+                n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)
+            })(window,document,'script','https://www.datadoghq-browser-agent.com/us3/v7/datadog-rum.js','DD_RUM');
+            @* @formatter:on  *@
+
+            window.DD_RUM.onReady(function () {
+                window.DD_RUM.init({
+                    clientToken: '@ddClientToken',
+                    applicationId: '@ddApplicationId',
+                    site: 'us3.datadoghq.com',
+                    service: '@service',
+                    env: '@AppSettings.ShortEnv',
+                    version: '@AppSettings.SimpleVersion',
+                    forwardErrorsToLogs: true,
+                    forwardConsoleLogs: ['error', 'warn'],
+                    sessionSampleRate: 100,
+                    sessionReplaySampleRate: 20,
+                    beforeSend: (log) => {
+                        // discard debug logs
+                        if (log.level === 'debug') return false;
+                    },
+                });
+            })
+        </script>
+    }
+}
