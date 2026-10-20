@@ -95,7 +95,9 @@ public static class CheckEmail
         message.SubjectEncoding = Encoding.UTF8;
         message.BodyEncoding = Encoding.UTF8;
 
+#pragma warning disable S5332 // EnableSsl should be set to true.
         using var client = new SmtpClient(options.SmtpHost, enableSsl ? options.SmtpSslPort : options.SmtpPort);
+#pragma warning restore S5332
         client.EnableSsl = enableSsl;
         await client.SendMailAsync(message);
     }
