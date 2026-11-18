@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using Azure.Identity;
+using JetBrains.Annotations;
 using ServerCheckupLibrary.Checks;
 using System.Reflection;
 
@@ -34,6 +35,8 @@ internal static class AppSettings
         AppDomain.CurrentDomain.SetData("REGEX_DEFAULT_MATCH_TIMEOUT", TimeSpan.FromMilliseconds(100));
 
         Version = GetVersion();
+        builder.AddKeyVault();
+
         ServerName = builder.Configuration.GetValue<string>(nameof(ServerName)) ?? "Unknown";
 
         builder.Configuration.GetSection(nameof(CheckEmailOptions)).Bind(CheckEmailOptions);
@@ -51,6 +54,15 @@ internal static class AppSettings
         var segments = (entryAssembly?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
             .InformationalVersion ?? entryAssembly?.GetName().Version?.ToString() ?? "").Split('+');
         return segments[0] + (segments.Length > 0 ? $"+{segments[1][..Math.Min(7, segments[1].Length)]}" : "");
+    }
+
+    private static void AddKeyVault(this IHostApplicationBuilder builder)
+    {
+        var keyVaultName = builder.Configuration.GetValue<string>("AzureKeyVaultName");
+        if (string.IsNullOrEmpty(keyVaultName)) return;
+
+        var keyVaultUri = new Uri($"https://{keyVaultName}.vault.azure.net");
+        builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
     }
 }
 
